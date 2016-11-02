@@ -1,27 +1,30 @@
 
 public class House{
 	//house condiction
+	public int floorSize;
 	public int lot;
 	public int year;
 	public int bedNumber;
 	public int bathNumber;
+
+	//address
+	public String zipcode;
+	public String state;
+	public String city;
 	public String address;
 
-	private int salePrice;
 
+	private int salePrice;
 	private int basePrice;
 	private int predictPrice;
 
+	//Coordinates
+	//latitude
+	public double lat;
+	//longitude
+	public double lng;
+
 	public House(){
-		//use house id to find house data
-		//some sql code
-
-		//testing code start
-		this.lot = 7405;
-		this.bedNumber = 3;
-		this.bathNumber = 1;
-		//testing code end
-
 	}
 	public House(String a, int l, int bed, int bath){
 		address = a;
@@ -29,6 +32,19 @@ public class House{
 		bedNumber = bed;
 		bathNumber = bath;
     }
+	//count distance
+	public double getDirectDistance(House h){
+		double EARTH_RADIUS = 6378.137;
+	    double radLat1 = h.lat * Math.PI / 180.0;
+	    double radLat2 = this.lat * Math.PI / 180.0;
+	    double a = radLat1 - radLat2;
+	    double b = (h.lng * Math.PI / 180.0) - (this.lng * Math.PI / 180.0);
+	    double s = 2.0 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) + Math.cos(radLat1)*Math.cos(radLat2)*Math.pow(Math.sin(b/2),2)));
+	    s = s * EARTH_RADIUS;
+	    s = Math.round(s * 10000.0) / 10000.0;
+		System.out.println(s);
+	    return s;
+	}
 
 	public void setLot(int l){
 		lot = l;
@@ -59,5 +75,14 @@ public class House{
 	}
 	public int getBasePrice(){
 		return basePrice;
+	}
+	public String getAddress(){
+		return address;
+	}
+	public void setPredictPrice(int p){
+		predictPrice = p;
+	}
+	public int getPredictPrice(){
+		return predictPrice;
 	}
 }
