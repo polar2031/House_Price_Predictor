@@ -1,3 +1,4 @@
+import java.util.Scanner;
 
 public class House{
 	//house condiction
@@ -24,15 +25,28 @@ public class House{
 	//longitude
 	public double lng;
 
+	//enter house info by terminal if no parameter
+	//NOT SAFE, NEED FURTHER EDITING
 	public House(){
 	}
-	public House(String a, int l, int bed, int bath){
-		address = a;
-		lot = l;
-		bedNumber = bed;
-		bathNumber = bath;
-    }
-	//count distance
+
+
+	public void setByTerminal(){
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Please enter address: ");
+		address = scanner.next();
+		System.out.println("Please enter city: ");
+		city = scanner.next();
+		System.out.println("Please enter zipcode: ");
+		zipcode = scanner.next();
+		System.out.println("Please enter floor size (sqft): ");
+		floorSize = scanner.nextInt();
+		System.out.println("Please enter number of bedrooms: ");
+		bedNumber = scanner.nextInt();
+		System.out.println("Please enter number of bathrooms: ");
+		bathNumber = scanner.nextInt();
+	}
+	//count distance between two houses using their coordinates
 	public double getDirectDistance(House h){
 		double EARTH_RADIUS = 6378.137;
 	    double radLat1 = h.lat * Math.PI / 180.0;
@@ -46,11 +60,11 @@ public class House{
 	    return s;
 	}
 
-	public void setLot(int l){
-		lot = l;
+	public void setFloorSize(int f){
+		floorSize = f;
 	}
-	public int getLot(){
-		return lot;
+	public int getFloorSize(){
+		return floorSize;
 	}
 	public void setBedNumber(int b){
 		bedNumber = b;
