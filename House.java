@@ -1,19 +1,21 @@
+import java.io.*;
 import java.util.Scanner;
+import com.google.gson.*;
+import org.jsoup.*;
 
 public class House{
 	//house condiction
 	public int floorSize;
-	public int lot;
+	public int lotSize;
 	public int year;
 	public int bedNumber;
 	public int bathNumber;
 
 	//address
-	public String zipcode;
-	public String state;
-	public String city;
 	public String address;
-
+	public String city;
+	public String state;
+	public String zipcode;
 
 	private int salePrice;
 	private int basePrice;
@@ -30,22 +32,95 @@ public class House{
 	public House(){
 	}
 
+	public House(
+		String address,
+		String city,
+		String state,
+		String zipcode,
+		int floorSize,
+		int bedNumber,
+		int bathNumber
+	){
+		this.address = address;
+		this.city = city;
+		this.state = state;
+		this.zipcode = zipcode;
+		System.out.println(this.address + " " + this.city + " " + this.state + " " + this.zipcode);
+		this.floorSize = floorSize;
+		this.bedNumber = bedNumber;
+		this.bathNumber = bathNumber;
 
+		//get coordinates from google
+		String leftSide = "https://maps.googleapis.com/maps/api/geocode/json?address=";
+		String rightSide = "&key=AIzaSyAkHCRteSI8pE17RvLpTggwZu267wwL3Lw";
+		String addressPart = address.replace(" ", "+");
+		String cityPart = city.replace(" ", "+");
+		String url = leftSide + addressPart + ",+" + cityPart + ",+" + state + rightSide;
+		String json = new String();
+		try{
+			json = Jsoup.connect(url).ignoreContentType(true).execute().body();
+		}
+		catch (IOException e) {System.out.println(e);}
+
+		JsonParser jsonParser = new JsonParser();
+		JsonObject coordinates = jsonParser.parse(json)
+			.getAsJsonObject().getAsJsonArray("results").get(0)
+			.getAsJsonObject().get("geometry")
+			.getAsJsonObject().getAsJsonObject("location");
+		lat = Double.parseDouble(coordinates.get("lat").getAsString());
+		lng = Double.parseDouble(coordinates.get("lng").getAsString());
+
+	}
 	public void setByTerminal(){
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("Please enter address: ");
-		address = scanner.next();
+		// address = scanner.nextLine();
+		address = "42b carriage dr";
+		System.out.println(address);
 		System.out.println("Please enter city: ");
-		city = scanner.next();
+		// city = scanner.nextLine();
+		city = "new bedford";
+		System.out.println(city);
+		System.out.println("Please enter state: ");
+		// state = scanner.nextLine();
+		state = "ma";
+		System.out.println(state);
 		System.out.println("Please enter zipcode: ");
-		zipcode = scanner.next();
-		System.out.println("Please enter floor size (sqft): ");
+		// zipcode = scanner.nextLine();
+		zipcode = "02740";
+		System.out.println(zipcode);
+
+		//get coordinates from google
+		String leftSide = "https://maps.googleapis.com/maps/api/geocode/json?address=";
+		String rightSide = "&key=AIzaSyAkHCRteSI8pE17RvLpTggwZu267wwL3Lw";
+		String addressPart = address.replace(" ", "+");
+		String cityPart = city.replace(" ", "+");
+		String url = leftSide + addressPart + ",+" + cityPart + ",+" + state + rightSide;
+		String json = new String();
+		try{
+			json = Jsoup.connect(url).ignoreContentType(true).execute().body();
+		}
+		catch (IOException e) {System.out.println(e);}
+
+		JsonParser jsonParser = new JsonParser();
+		JsonObject coordinates = jsonParser.parse(json)
+    		.getAsJsonObject().getAsJsonArray("results").get(0)
+    		.getAsJsonObject().get("geometry")
+		    .getAsJsonObject().getAsJsonObject("location");
+		lat = Double.parseDouble(coordinates.get("lat").getAsString());
+		lng = Double.parseDouble(coordinates.get("lng").getAsString());
+		System.out.println(lat);
+		System.out.println(lng);
+
+		System.out.println("Please enter floor area (sqft): ");
 		floorSize = scanner.nextInt();
 		System.out.println("Please enter number of bedrooms: ");
 		bedNumber = scanner.nextInt();
 		System.out.println("Please enter number of bathrooms: ");
 		bathNumber = scanner.nextInt();
+
 	}
+
 	//count distance between two houses using their coordinates
 	public double getDirectDistance(House h){
 		double EARTH_RADIUS = 6378.137;
@@ -60,10 +135,10 @@ public class House{
 	    return s;
 	}
 
-	public void setFloorSize(int f){
+	public void setfloorSize(int f){
 		floorSize = f;
 	}
-	public int getFloorSize(){
+	public int getfloorSize(){
 		return floorSize;
 	}
 	public void setBedNumber(int b){
