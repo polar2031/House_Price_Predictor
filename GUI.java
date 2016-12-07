@@ -68,13 +68,13 @@ public class GUI {
 
             input[i] = t1_1;
         }
-        input[0].setText("42b carriage dr");
-        input[1].setText("new bedford");
+        input[0].setText("34 Longmeadow Ln");
+        input[1].setText("Town of Sharon");
         input[2].setText("ma");
-        input[3].setText("02740");
-        input[4].setText("3000");
-        input[5].setText("4");
-        input[6].setText("3");
+        input[3].setText("02067");
+        input[4].setText("2116");
+        input[5].setText("3");
+        input[6].setText("2");
 
 
 
@@ -127,9 +127,9 @@ public class GUI {
                                 input[3].getText(),
                                 Integer.parseInt(input[4].getText()),
                                 Integer.parseInt(input[5].getText()),
-                                Integer.parseInt(input[6].getText()));
+                                Integer.parseInt(input[6].getText()),
+								0);
             PricePredictor p = new PricePredictor(h);
-            System.out.println("Thanks Giving!!!");
         }
     }
 }

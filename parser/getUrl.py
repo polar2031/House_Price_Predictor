@@ -3,29 +3,38 @@ import os, os.path, sys, re, time, datetime, urllib.request
 from html.parser import HTMLParser
 #<a href="/homedetails/198-Cornell-St-New-Bedford-MA-02740/55998508_zpid/" class="zsg-photo-card-overlay-link routable hdp-link routable mask hdp-link" id="yui_3_18_1_1_1475656807922_8825"></a>
 class factParser(HTMLParser):
-    def __init__(self): 
-        self.taglevels = [] 
+    def __init__(self):
+        self.taglevels = []
         self.handledtags = ['a']
-        self.processing = None 
-        HTMLParser.__init__(self) 
-    def handle_starttag(self, tag, attrs): 
+        self.processing = None
+        HTMLParser.__init__(self)
+    def handle_starttag(self, tag, attrs):
         if tag in self.handledtags:
             for name, value in attrs:
-                if name == href:
+                # if name == 'href':
+                #     print(name)
+                #     print(value)
+                #     print(dict(attrs)['href'])
                 if name == 'class' and value == 'zsg-photo-card-overlay-link routable hdp-link routable mask hdp-link':
-                    self.data = '' 
-                    self.processing = tag 
-    def handle_data(self, data): 
+                    self.data = ''
+                    self.processing = tag
+                    print('http://www.zillow.com' + dict(attrs)['href'])
+    def handle_data(self, data):
         if self.processing:
             self.data += data
-            print(data)
-    def handle_endtag(self, tag): 
+            # print(data)
+    def handle_endtag(self, tag):
         if tag == self.processing:
             self.processing = None
 
-url = 'http://www.zillow.com/homes/for_sale/New-Bedford-MA-02740/pmf,pf_pt/house_type/58880_rid/4-_beds/globalrelevanceex_sort/41.644729,-70.914559,41.618041,-70.971551_rect/13_zm/'
+leftUrl = 'http://www.zillow.com/homes/recently_sold/'
+middleUrl = 'Town-of-Sharon-MA-02067'
+rightUrl = '/house,condo,apartment_duplex,townhouse_type/11_zm/'
 
-fh = urllib.request.urlopen(url)
-html = fh.read().decode("utf8")
-tp = factParser()
-tp.feed(html)
+
+for num in range(1, 20):
+    url = leftUrl + middleUrl + rightUrl + str(num) + '_p'
+    fh = urllib.request.urlopen(url)
+    html = fh.read().decode("utf8")
+    tp = factParser()
+    tp.feed(html)

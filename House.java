@@ -27,6 +27,9 @@ public class House{
 	//longitude
 	public double lng;
 
+	//house's weight while counting
+	int weight;
+
 	//enter house info by terminal if no parameter
 	//NOT SAFE, NEED FURTHER EDITING
 	public House(){
@@ -39,16 +42,18 @@ public class House{
 		String zipcode,
 		int floorSize,
 		int bedNumber,
-		int bathNumber
+		int bathNumber,
+		int salePrice
 	){
 		this.address = address;
 		this.city = city;
 		this.state = state;
 		this.zipcode = zipcode;
-		System.out.println(this.address + " " + this.city + " " + this.state + " " + this.zipcode);
+		System.out.println("Create: " + this.address + " " + this.city + " " + this.state + " " + this.zipcode);
 		this.floorSize = floorSize;
 		this.bedNumber = bedNumber;
 		this.bathNumber = bathNumber;
+		this.salePrice = salePrice;
 
 		//get coordinates from google
 		String leftSide = "https://maps.googleapis.com/maps/api/geocode/json?address=";
@@ -69,6 +74,15 @@ public class House{
 			.getAsJsonObject().getAsJsonObject("location");
 		lat = Double.parseDouble(coordinates.get("lat").getAsString());
 		lng = Double.parseDouble(coordinates.get("lng").getAsString());
+
+		//set default weight to 1
+		weight = 1;
+		try{
+			Thread.sleep(1000);
+		}
+		catch(InterruptedException ex) {
+    		Thread.currentThread().interrupt();
+		}
 
 	}
 	public void setByTerminal(){
@@ -131,7 +145,7 @@ public class House{
 	    double s = 2.0 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) + Math.cos(radLat1)*Math.cos(radLat2)*Math.pow(Math.sin(b/2),2)));
 	    s = s * EARTH_RADIUS;
 	    s = Math.round(s * 10000.0) / 10000.0;
-		System.out.println(s);
+		// System.out.println(s);
 	    return s;
 	}
 
