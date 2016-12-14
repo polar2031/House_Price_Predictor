@@ -1,7 +1,9 @@
 import java.io.*;
 import java.util.Scanner;
+
 import com.google.gson.*;
 import org.jsoup.*;
+
 
 public class House{
 	//house condiction
