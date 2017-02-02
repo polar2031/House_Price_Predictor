@@ -12,23 +12,26 @@ public class GUI {
 	private JFrame f;
 	private JTextField input[];
     private JTextArea output;
+    // Input columns' name
+    String name[] = {"Address",
+                     "City",
+                     "State",
+                     "Zip",
+                     "Floor Size",
+                     "Number of Bed Room",
+                     "Number of Bath Room"};
 
 	public GUI(){
-        String name[] = {"Address",
-                         "City",
-                         "State",
-                         "Zip",
-                         "Floor Size",
-                         "Bed Number",
-                         "Bath Number"};
-
-
+        // create frame with name "House Price Predictor"
 		f = new JFrame("House Price Predictor");
+        // set frame size
         f.setSize(1200, 800);
+        // set frame layout type
         f.setLayout(new GridBagLayout());
+        // exit GUI after closing the frame
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        GridBagConstraints c = new GridBagConstraints();
 
+        GridBagConstraints c = new GridBagConstraints();
         JPanel p1 = new JPanel();
         p1.setLayout(new GridBagLayout());
         c.gridx = 0;
@@ -41,6 +44,7 @@ public class GUI {
         c.anchor = GridBagConstraints.CENTER;
         f.add(p1, c);
 
+        // set input area
         GridBagConstraints c1 = new GridBagConstraints();
         input = new JTextField[name.length];
         for(int i = 0; i < name.length; i++){
@@ -68,16 +72,18 @@ public class GUI {
 
             input[i] = t1_1;
         }
+
+        // set default text in input columns
         input[0].setText("34 Longmeadow Ln");
         input[1].setText("Town of Sharon");
         input[2].setText("ma");
         input[3].setText("02067");
-        input[4].setText("2116");
-        input[5].setText("3");
-        input[6].setText("2");
+        // input[4].setText("2116");
+        // input[5].setText("3");
+        // input[6].setText("2");
 
 
-
+        // set button area
         JPanel p2 = new JPanel();
         p2.setLayout(new GridBagLayout());
         c.gridx = 0;
@@ -94,7 +100,7 @@ public class GUI {
         p2.add(b2_1);
         b2_1.addActionListener(new StartLitener());
 
-
+        // set output area
         JPanel p3 = new JPanel();
         p3.setLayout(new BorderLayout(5, 5));
         c.gridx = 0;
@@ -116,20 +122,22 @@ public class GUI {
         System.setOut(printStream);
         // System.setErr(printStream);
 
+        // turn frame visible
 		f.setVisible(true);
 	}
 
     class StartLitener implements ActionListener{
         public void actionPerformed(ActionEvent event) {
+            // build target object
+
             House h = new House(input[0].getText(),
                                 input[1].getText(),
                                 input[2].getText(),
-                                input[3].getText(),
-                                Integer.parseInt(input[4].getText()),
-                                Integer.parseInt(input[5].getText()),
-                                Integer.parseInt(input[6].getText()),
-								0);
-            PricePredictor p = new PricePredictor(h);
+                                input[3].getText());
+			PricePredictor p = new PricePredictor();
+			p.start(h);
+
+
         }
     }
 }

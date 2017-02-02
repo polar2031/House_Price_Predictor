@@ -1,218 +1,196 @@
 import java.io.*;
+import java.util.*;
 import java.lang.Math.*;
 import org.apache.commons.math3.linear.*;
 
-public class PricePredictor
-{
-	private House target;
-	private House[] samples;
+public class PricePredictor{
+    ArrayList<House> samples;
 
-	public PricePredictor(House h){
-		//set target data
-		target = h;
+    public PricePredictor(){
+    }
 
-		//get sample house data
-		getDatabaseSample();
+    public boolean start(House h){
+        return this.start(h, "leastSquare");
+    }
+    public boolean start(House h, String predictMethod){
 
-		//count base price using sample data
-		countBasePrice();
-		System.out.println("Base Price: " + target.getBasePrice());
-		// System.out.println("Predict Price: " + target.getPredictPrice());
-	}
+        /////////////////////////////////////////
+        //get target house info from Zillow.com//
+        /////////////////////////////////////////
+        if(h.getInfoFromZillow() == false){
+            // no house info on the internet
+            System.out.println("House info does not exist on Zillow.com.");
+            // System.out.println("Please enter house info manually.")
+            return false;
+        }
+        else{
+            System.out.println("House info found on Zillow.com.");
+            System.err.println("Floor Size: " + h.floorSize);
+            System.err.println("Lot Size: " + h.lotSize);
+            System.err.println("Bedroom Number" + h.bedroomNumber);
+            System.err.println("Bathroom Number: " + h.bathroomNumber);
+        }
 
-	public PricePredictor(){
-		//set target data
-		target = new House();
-		target.setByTerminal();
+        ///////////////////////////////
+        //update local data if needed//
+        ///////////////////////////////
+        boolean updateRequirement = true;
+        if(updateRequirement){
+            ZillowParser z = new ZillowParser();
+            z.parseSameCityHouses(h);
+        }
 
-		//get sample house data
-		getDatabaseSample();
+        /////////////////////////////////////
+        //read data of recently sold houses//
+        /////////////////////////////////////
+        if(!readSampleFromAllData(h)){
+            System.err.println("file_access_error: read sample data");
+            return false;
+        }
 
-		//count base price using sample data
-		countBasePrice();
-		predict();
-		System.out.println("Base Price: " + target.getBasePrice());
-		System.out.println("Predict Price: " + target.getPredictPrice());
-	}
+        /////////////////////
+        //weight adjustment//
+        /////////////////////
+        int totalWeight = weightAdjustment(h);
+        System.err.println("weight: " + totalWeight);
 
-	//get sample houses from database
-	public void getDatabaseSample(){
-		int sampleNumber = 480;
-		samples = new House[sampleNumber];
-		//read data
-		try{
-			FileReader f = new FileReader("houseData");
-			BufferedReader br = new BufferedReader(f);
-			String line = null;
-			String[] tempTrainData = null;
 
-			for(int i = 0; i < sampleNumber; i++){
-				//filter start
+        ////////////////////////////////////////////
+        //use selected method to do the prediction//
+        ////////////////////////////////////////////
+        boolean re = false;
+        switch(predictMethod){
+            //default: same city
+            case "default":
+            case "leastSquare":
+                re = leastSquare(h, totalWeight);
+                break;
+        }
+        System.err.println(re);
+        System.err.println("Predict Price: " + h.predictBasePrice);
+        System.err.println("Last Sold Price: " + h.lastSoldPrice);
+        System.out.println("Predict Price: " + h.predictBasePrice);
+        System.out.println("Last Sold Price: " + h.lastSoldPrice);
+        return re;
+    }
+    private boolean leastSquare(House h, int totalWeight){
 
-				//filter end
-				// samples[i] = new House();
-				// line = br.readLine();
-				// tempTrainData = line.split(" ");
-				// samples[i].setBedNumber(Integer.parseInt(tempTrainData[0]));
-				// samples[i].setBathNumber(Integer.parseInt(tempTrainData[1]));
-				// samples[i].setfloorSize(Integer.parseInt(tempTrainData[2]));
-				// samples[i].setSalePrice(Integer.parseInt(tempTrainData[3]));
-				// samples[i].lat = Double.parseDouble(tempTrainData[4]);
-				// samples[i].lng = Double.parseDouble(tempTrainData[5]);
-				String address;
-				String city;
-				String state;
-				String zipcode;
-				int floorSize;
-				int bedNumber;
-				int bathNumber;
-				int salePrice;
-				state = br.readLine();
-				city = br.readLine();
-				zipcode = br.readLine();
-				address = br.readLine();
-				bedNumber = Integer.parseInt(br.readLine());
-				bathNumber = Integer.parseInt(br.readLine());
-				floorSize = Integer.parseInt(br.readLine());
-				salePrice = Integer.parseInt(br.readLine());
-				br.readLine();
-				br.readLine();
-				br.readLine();
-				samples[i] = new House(address,
-										city,
-										state,
-										zipcode,
-										floorSize,
-										bedNumber,
-										bathNumber,
-										salePrice);
-			}
-		}
-		catch (IOException e) {System.out.println(e);}
-	}
+        double thisYear = 2017;
+        //number of features
+        int vNumber = 4;
+        //features
+        double[][] a = new double[totalWeight][vNumber];
+        //price
+        double[] b = new double[totalWeight];
+        int c = 0;
+        for(int i = 0; i < samples.size(); i++){
+            for(int j = 0; j < samples.get(i).weight; j++){
+                a[c][0] = (double)samples.get(i).floorSize;
+                a[c][1] = (double)samples.get(i).lotSize;
+                a[c][2] = (double)samples.get(i).bedroomNumber;
+                a[c][3] = (double)samples.get(i).bathroomNumber;
+                b[c] = (double)samples.get(i).lastSoldPrice;
+                c++;
+            }
+        }
+        try{
+            RealMatrix coefficients = new Array2DRowRealMatrix(a, false);
 
-	//get sample houses data from Zillow
-	public void getZillowSample(){
-		ZillowParser z = new ZillowParser();
+            // DecompositionSolver solver = new QRDecomposition(coefficients).getSolver();
+            DecompositionSolver solver = new SingularValueDecomposition(coefficients).getSolver();
+            RealMatrix constants = new Array2DRowRealMatrix(b);
+            //
+            RealMatrix solution = solver.solve(constants);
+            //
+            double[][] test = {{h.floorSize, h.lotSize, h.bedroomNumber, h.bathroomNumber}};
+            RealMatrix tMatrix = new Array2DRowRealMatrix(test);
 
-	}
+            // System.out.println(tMatrix.getRowDimension());
+            // System.out.println(tMatrix.getColumnDimension());
+            // System.out.println(solution.getRowDimension());
+            // System.out.println(solution.getColumnDimension());
 
-	//count base price
-	public void countBasePrice(){
-		//temp method: average
-		//double pricePerLot = 0;
-		// for(int i = 0; i < samples.length; i++){
-		// 	pricePerLot += samples[i].getSalePrice() / samples[i].getLot();
-		// }
-		// pricePerLot /= samples.length;
-		// target.setBasePrice(pricePerLot * target.getLot());
+            RealMatrix p = tMatrix.multiply(solution);
+            // System.out.println(p.getRowDimension());
+            // System.out.println(p.getColumnDimension());
+            h.predictBasePrice = p.getEntry(0, 0);
+        }
+        catch(SingularMatrixException sme){
+            System.err.println("SingularMatrixException");
+            h.predictBasePrice = 1.0;
+            return false;
+        }
+        return true;
+    }
+    private boolean readSampleFromAllData(House h){
+        try{
+            File folder = new File("./houseData/");
+            File files[] = folder.listFiles();
+            samples = new ArrayList<House>();
+            for(int i = 0; i < files.length; i++){
+                // System.err.println(files[i].toString());
+                FileReader f = new FileReader(files[i].toString());
+                House temp = new House();
+                if(temp.readFromFile(f)){
+                    samples.add(temp);
+                    // System.err.println(samples.get(i).address);
+                    temp = new House();
+                }
+                f.close();
+            }
+        }
+        catch(IOException ioe){
+            return false;
+        }
+        return true;
+    }
 
-		//method: add weight based on distance
-		// double totalWeight = 0.0;
-		// for(int i = 0; i < samples.length; i++){
-		// 	//get distance
-		// 	double weight = 1.0 /b;
-		// 	//to prevent target itself
-		// 	if(weight != 0.0){
-		// 		pricePerLot += (double)samples[i].getSalePrice() / (double)samples[i].getLot() * weight;
-		// 		totalWeight += weight;
-		// 	}
-		// }
-		// pricePerLot /= totalWeight;
-		// target.setBasePrice((int)pricePerLot * target.getLot());
+    private int weightAdjustment(House h){
+        //counting sample houses' weight
+        int totalWeight = 0;
+        double pricePerSqft = 0.0;
+        double totalSqft = 0.0;
+        for(int i = 0; i < samples.size(); i++){
+            pricePerSqft += samples.get(i).lastSoldPrice;
+            totalSqft += samples.get(i).floorSize;
+        }
+        pricePerSqft = pricePerSqft / totalSqft;
 
-		//method: Linear least squares
-		//price X sqft
-		// double xy = 0.0;
-		// double x = 0.0;
-		// double y = 0.0;
-		// double x2 = 0.0;
-		// int n = 0;
-		// for(int i = 0; i < samples.length; i++){
-		// 	//filter
-		// 	if((samples[i].getfloorSize() - target.getfloorSize()) < (target.getfloorSize() * 0.5) ||
-		// 	(samples[i].getfloorSize() - target.getfloorSize()) > (target.getfloorSize() * -0.5) ){
-		// 		xy += (double)samples[i].getSalePrice() * (double)samples[i].getfloorSize();
-		// 		x += (double)samples[i].getfloorSize();
-		// 		y += (double)samples[i].getSalePrice();
-		// 		x2 += (double)samples[i].getfloorSize() * (double)samples[i].getfloorSize();
-		// 		n += 1;
-		// 	}
-		// }
-		// double b1 = (xy - (x * y / n)) / (x2 - x * x / n);
-		// double b0 = (y - b1 * x) / n;
-		// target.setBasePrice((int)(b0 + b1 * target.getfloorSize()));
+        for(int i = 0; i < samples.size(); i++){
+            //weight based on distance
+            double distance = samples.get(i).getDirectDistance(h);
+            if(distance < 1.0){
+                samples.get(i).weight += 4;
+            }
+            else if(distance < 1.0){
+                samples.get(i).weight += 3;
+            }
+            else if(distance < 1.5){
+                samples.get(i).weight += 2;
+            }
+            else if(distance < 2.0){
+                samples.get(i).weight += 1;
+            }
+            // weight based on floor size
+            double sizeDiffer = Math.abs(h.floorSize - samples.get(i).floorSize) / h.floorSize;
+            if(sizeDiffer < 0.1){
+                samples.get(i).weight *= 8;
+            }
+            else if(sizeDiffer < 0.15){
+                samples.get(i).weight *= 4;
+            }
+            else if(sizeDiffer < 0.2){}
+            else{
+                samples.get(i).weight = 0;
+            }
 
-		//counting sample houses' weight
-		int totalWeight = 0;
-		for(int i = 0; i < samples.length; i++){
-			//weight based on distance
-			double distance = samples[i].getDirectDistance(target);
-			if(distance < 1.0){
-				samples[i].weight += 4;
-			}
-			else if(distance < 2.0){
-				samples[i].weight += 3;
-			}
-			else if(distance < 3.0){
-				samples[i].weight += 2;
-			}
-			else if(distance < 4.0){
-				samples[i].weight += 1;
-			}
-			//weight based on floor size
-			double sizeDiffer = Math.abs(target.floorSize - samples[i].floorSize) / target.floorSize;
-			if(sizeDiffer < 0.25){
-				samples[i].weight *= 4;
-			}
-			else if(sizeDiffer < 0.5){
-				samples[i].weight *= 2;
-			}
-			else if(sizeDiffer < 0.75){}
-			else{
-				samples[i].weight = 0;
-			}
-			totalWeight += samples[i].weight;
-		}
+            double pricePerSqftDiff = Math.abs(samples.get(i).lastSoldPrice / samples.get(i).floorSize - pricePerSqft) / pricePerSqft;
+            if(pricePerSqftDiff > 0.5){
+                samples.get(i).weight = 0;
+            }
 
-		//price x floor size x bed x bath
-		int vNumber = 3;
-		double[][] a = new double[totalWeight][vNumber];//
-		double[] b = new double[totalWeight];//price
-		int c = 0;
-		for(int i = 0; i < samples.length; i++){
-			for(int j = 0; j < samples[i].weight; j++){
-				a[c][0] = (double)samples[i].getfloorSize();
-				a[c][1] = (double)samples[i].getBedNumber();
-				a[c][2] = (double)samples[i].getBathNumber();
-				b[c] = (double)samples[i].getSalePrice();
-				c++;
-			}
-		}
-
-		RealMatrix coefficients = new Array2DRowRealMatrix(a, false);
-		DecompositionSolver solver = new QRDecomposition(coefficients).getSolver();
-		RealMatrix constants = new Array2DRowRealMatrix(b);
-		RealMatrix solution = solver.solve(constants);
-		double[][] test = {{target.getfloorSize(), target.getBedNumber(), target.getBathNumber()}};
-		RealMatrix tMatrix = new Array2DRowRealMatrix(test);
-		// System.out.println(tMatrix.getRowDimension());
-		// System.out.println(tMatrix.getColumnDimension());
-		// System.out.println(solution.getRowDimension());
-		// System.out.println(solution.getColumnDimension());
-
-		RealMatrix p = tMatrix.multiply(solution);
-		// System.out.println(p.getRowDimension());
-		// System.out.println(p.getColumnDimension());
-		target.setBasePrice((int)p.getEntry(0, 0));
-	}
-
-	public void predict(){
-		// int bedRate = 500;
-		// int bathRate = 500;
-		// int bedAdjust = target.bedNumber * bedRate;
-		// int bathAdjust = target.bathNumber * bathRate;
-		// target.setPredictPrice(target.getBasePrice() + bedRate + bathRate);
-
-	}
+            totalWeight += samples.get(i).weight;
+        }
+        return totalWeight;
+    }
 }

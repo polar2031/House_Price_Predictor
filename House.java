@@ -1,193 +1,127 @@
 import java.io.*;
 import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import com.google.gson.*;
 import org.jsoup.*;
 
-
 public class House{
-	//house condiction
-	public int floorSize;
-	public int lotSize;
-	public int year;
-	public int bedNumber;
-	public int bathNumber;
+    // house address
+    public String address;
+    public String city;
+    public String state;
+    public String zip;
 
-	//address
-	public String address;
-	public String city;
-	public String state;
-	public String zipcode;
+    // basic house info
+    public double floorSize;
+    public double lotSize;
+    public double bedroomNumber;
+    public double bathroomNumber;
+    public double latitute;
+    public double longtitute;
+    public int builtYear;
 
-	private int salePrice;
-	private int basePrice;
-	private int predictPrice;
+    // price
+    public Double lastSoldPrice;
+    public String lastSoldDate;
+    public Double predictBasePrice;
+    public Double predictPrice;
 
-	//Coordinates
-	//latitude
-	public double lat;
-	//longitude
-	public double lng;
+    // weight of the sample
+    public int weight;
 
-	//house's weight while counting
-	int weight;
+    // non standard features
+    public String features[];
 
-	//enter house info by terminal if no parameter
-	//NOT SAFE, NEED FURTHER EDITING
-	public House(){
-	}
+    public House(){
+    }
 
-	public House(
-		String address,
-		String city,
-		String state,
-		String zipcode,
-		int floorSize,
-		int bedNumber,
-		int bathNumber,
-		int salePrice
-	){
-		this.address = address;
-		this.city = city;
-		this.state = state;
-		this.zipcode = zipcode;
-		System.out.println("Create: " + this.address + " " + this.city + " " + this.state + " " + this.zipcode);
-		this.floorSize = floorSize;
-		this.bedNumber = bedNumber;
-		this.bathNumber = bathNumber;
-		this.salePrice = salePrice;
+    public House(String address, String city, String state, String zip){
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
+    }
 
-		//get coordinates from google
-		String leftSide = "https://maps.googleapis.com/maps/api/geocode/json?address=";
-		String rightSide = "&key=AIzaSyAkHCRteSI8pE17RvLpTggwZu267wwL3Lw";
-		String addressPart = address.replace(" ", "+");
-		String cityPart = city.replace(" ", "+");
-		String url = leftSide + addressPart + ",+" + cityPart + ",+" + state + rightSide;
-		String json = new String();
-		try{
-			json = Jsoup.connect(url).ignoreContentType(true).execute().body();
-		}
-		catch (IOException e) {System.out.println(e);}
+    public boolean getInfoFromZillow(){
+        ZillowParser z = new ZillowParser();
+        return z.parseHouse(this);;
+    }
 
-		JsonParser jsonParser = new JsonParser();
-		JsonObject coordinates = jsonParser.parse(json)
-			.getAsJsonObject().getAsJsonArray("results").get(0)
-			.getAsJsonObject().get("geometry")
-			.getAsJsonObject().getAsJsonObject("location");
-		lat = Double.parseDouble(coordinates.get("lat").getAsString());
-		lng = Double.parseDouble(coordinates.get("lng").getAsString());
+    public boolean writeToFile(FileWriter f){
+        try{
+            f.write(address + "\n");
+            f.write(city + "\n");
+            f.write(state + "\n");
+            f.write(zip + "\n");
+            f.write(String.valueOf(bedroomNumber) + "\n");
+            f.write(String.valueOf(bathroomNumber) + "\n");
+            f.write(String.valueOf(floorSize) + "\n");
+            f.write(String.valueOf(lastSoldPrice) + "\n");
+            f.write(lastSoldDate + "\n");
+            f.write(String.valueOf(latitute) + "\n");
+            f.write(String.valueOf(longtitute) + "\n");
+            f.write(String.valueOf(builtYear) + "\n");
+            if(features != null){
+                f.write(String.valueOf(features.length) + "\n");
+                for(int i = 0; i < features.length; i++){
+                    f.write(features[i] + "\n");
+                }
+            }
+            else{
+                f.write("0\n");
+            }
+            f.write("\n");
+        }
+        catch(IOException ioe){
+            return false;
+        }
+        return true;
+    }
 
-		//set default weight to 1
-		weight = 1;
-		try{
-			Thread.sleep(1000);
-		}
-		catch(InterruptedException ex) {
-    		Thread.currentThread().interrupt();
-		}
+    public boolean readFromFile(FileReader f){
+        try{
+            BufferedReader br = new BufferedReader(f);
+            String line = null;
+			String[] tempTrainData = null;
 
-	}
-	public void setByTerminal(){
-		Scanner scanner = new Scanner(System.in);
-		System.out.println("Please enter address: ");
-		// address = scanner.nextLine();
-		address = "42b carriage dr";
-		System.out.println(address);
-		System.out.println("Please enter city: ");
-		// city = scanner.nextLine();
-		city = "new bedford";
-		System.out.println(city);
-		System.out.println("Please enter state: ");
-		// state = scanner.nextLine();
-		state = "ma";
-		System.out.println(state);
-		System.out.println("Please enter zipcode: ");
-		// zipcode = scanner.nextLine();
-		zipcode = "02740";
-		System.out.println(zipcode);
+            address = br.readLine();
+            city = br.readLine();
+            state = br.readLine();
+            zip = br.readLine();
+            bedroomNumber = Double.parseDouble(br.readLine());
+            bathroomNumber = Double.parseDouble(br.readLine());
+            floorSize = Double.parseDouble(br.readLine());
+            lastSoldPrice = Double.parseDouble(br.readLine());
+            lastSoldDate = br.readLine();
+            latitute = Double.parseDouble(br.readLine());
+            longtitute = Double.parseDouble(br.readLine());
+            builtYear = Integer.parseInt(br.readLine());
+            features = new String[Integer.parseInt(br.readLine())];
+            for(int i = 0; i < features.length; i++){
+                features[i] = br.readLine();
+            }
+            br.readLine();
+        }
+        catch(IOException ioe){
+            return false;
+        }
+        return true;
+    }
 
-		//get coordinates from google
-		String leftSide = "https://maps.googleapis.com/maps/api/geocode/json?address=";
-		String rightSide = "&key=AIzaSyAkHCRteSI8pE17RvLpTggwZu267wwL3Lw";
-		String addressPart = address.replace(" ", "+");
-		String cityPart = city.replace(" ", "+");
-		String url = leftSide + addressPart + ",+" + cityPart + ",+" + state + rightSide;
-		String json = new String();
-		try{
-			json = Jsoup.connect(url).ignoreContentType(true).execute().body();
-		}
-		catch (IOException e) {System.out.println(e);}
+    //count distance between two houses using their coordinates
+    public double getDirectDistance(House h){
+        double EARTH_RADIUS = 6378.137;
+        double radLat1 = h.latitute * Math.PI / 180.0;
+        double radLat2 = this.latitute * Math.PI / 180.0;
+        double a = radLat1 - radLat2;
+        double b = (h.longtitute * Math.PI / 180.0) - (this.longtitute * Math.PI / 180.0);
+        double s = 2.0 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) + Math.cos(radLat1)*Math.cos(radLat2)*Math.pow(Math.sin(b/2),2)));
+        s = s * EARTH_RADIUS;
+        s = Math.round(s * 10000.0) / 10000.0;
+        // System.out.println(s);
+        return s;
+    }
 
-		JsonParser jsonParser = new JsonParser();
-		JsonObject coordinates = jsonParser.parse(json)
-    		.getAsJsonObject().getAsJsonArray("results").get(0)
-    		.getAsJsonObject().get("geometry")
-		    .getAsJsonObject().getAsJsonObject("location");
-		lat = Double.parseDouble(coordinates.get("lat").getAsString());
-		lng = Double.parseDouble(coordinates.get("lng").getAsString());
-		System.out.println(lat);
-		System.out.println(lng);
-
-		System.out.println("Please enter floor area (sqft): ");
-		floorSize = scanner.nextInt();
-		System.out.println("Please enter number of bedrooms: ");
-		bedNumber = scanner.nextInt();
-		System.out.println("Please enter number of bathrooms: ");
-		bathNumber = scanner.nextInt();
-
-	}
-
-	//count distance between two houses using their coordinates
-	public double getDirectDistance(House h){
-		double EARTH_RADIUS = 6378.137;
-	    double radLat1 = h.lat * Math.PI / 180.0;
-	    double radLat2 = this.lat * Math.PI / 180.0;
-	    double a = radLat1 - radLat2;
-	    double b = (h.lng * Math.PI / 180.0) - (this.lng * Math.PI / 180.0);
-	    double s = 2.0 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) + Math.cos(radLat1)*Math.cos(radLat2)*Math.pow(Math.sin(b/2),2)));
-	    s = s * EARTH_RADIUS;
-	    s = Math.round(s * 10000.0) / 10000.0;
-		// System.out.println(s);
-	    return s;
-	}
-
-	public void setfloorSize(int f){
-		floorSize = f;
-	}
-	public int getfloorSize(){
-		return floorSize;
-	}
-	public void setBedNumber(int b){
-		bedNumber = b;
-	}
-	public int getBedNumber(){
-		return bedNumber;
-	}
-	public void setBathNumber(int b){
-		bathNumber = b;
-	}
-	public int getBathNumber(){
-		return bathNumber;
-	}
-	public void setSalePrice(int price){
-		salePrice = price;
-	}
-	public int getSalePrice(){
-		return salePrice;
-	}
-	public void setBasePrice(int price){
-		basePrice = price;
-	}
-	public int getBasePrice(){
-		return basePrice;
-	}
-	public String getAddress(){
-		return address;
-	}
-	public void setPredictPrice(int p){
-		predictPrice = p;
-	}
-	public int getPredictPrice(){
-		return predictPrice;
-	}
 }
