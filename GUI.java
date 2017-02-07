@@ -22,6 +22,11 @@ public class GUI {
                      "Number of Bath Room"};
 
 	public GUI(){
+		//set program style as default style of OS
+		try{
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}
+		catch(Exception e){}
         // create frame with name "House Price Predictor"
 		f = new JFrame("House Price Predictor");
         // set frame size
@@ -34,6 +39,8 @@ public class GUI {
         GridBagConstraints c = new GridBagConstraints();
         JPanel p1 = new JPanel();
         p1.setLayout(new GridBagLayout());
+		// EmptyBorder(up, left, down, right)
+		p1.setBorder(new EmptyBorder(0,20,0,20));
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 1;
@@ -53,7 +60,7 @@ public class GUI {
             c1.gridy = i;
             c1.gridwidth = 1;
             c1.gridheight = 1;
-            c1.weightx = 0;
+            c1.weightx = 1;
             c1.weighty = 0;
             c1.fill = GridBagConstraints.NONE;
             c1.anchor = GridBagConstraints.WEST;
@@ -62,9 +69,9 @@ public class GUI {
             JTextField t1_1 = new JTextField();
             c1.gridx = 1;
             c1.gridy = i;
-            c1.gridwidth = 1;
+            c1.gridwidth = 10;
             c1.gridheight = 1;
-            c1.weightx = 1;
+            c1.weightx = 10;
             c1.weighty = 0;
             c1.fill = GridBagConstraints.BOTH;
             c1.anchor = GridBagConstraints.WEST;
@@ -86,6 +93,7 @@ public class GUI {
         // set button area
         JPanel p2 = new JPanel();
         p2.setLayout(new GridBagLayout());
+		p2.setBorder(new EmptyBorder(10,20,10,20));
         c.gridx = 0;
         c.gridy = 1;
         c.gridwidth = 1;
@@ -103,10 +111,11 @@ public class GUI {
         // set output area
         JPanel p3 = new JPanel();
         p3.setLayout(new BorderLayout(5, 5));
+		p3.setBorder(new EmptyBorder(0,20,10,20));
         c.gridx = 0;
         c.gridy = 2;
         c.gridwidth = 1;
-        c.gridheight = 4;
+        c.gridheight = 1;
         c.weightx = 1;
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
@@ -114,7 +123,7 @@ public class GUI {
         f.add(p3, c);
 
 
-        JTextArea t3_1 = new JTextArea(50, 20);
+        JTextArea t3_1 = new JTextArea(5, 20);
         //t3_1.setEditable(false);
         p3.add(new JScrollPane(t3_1));
         output = t3_1;

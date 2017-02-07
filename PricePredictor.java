@@ -37,7 +37,7 @@ public class PricePredictor{
         boolean updateRequirement = true;
         if(updateRequirement){
             ZillowParser z = new ZillowParser();
-            z.parseSameCityHouses(h);
+            z.parseNearbyHouses(h);
         }
 
         /////////////////////////////////////

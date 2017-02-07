@@ -46,7 +46,7 @@ public class House{
 
     public boolean getInfoFromZillow(){
         ZillowParser z = new ZillowParser();
-        return z.parseHouse(this);;
+        return z.parseHouse(this);
     }
 
     public boolean writeToFile(FileWriter f){
@@ -112,7 +112,9 @@ public class House{
 
     //count distance between two houses using their coordinates
     public double getDirectDistance(House h){
-        double EARTH_RADIUS = 6378.137;
+        //earth ratius
+        //6378.137 km = 3963.1906 mile
+        double EARTH_RADIUS = 3963.1906;
         double radLat1 = h.latitute * Math.PI / 180.0;
         double radLat2 = this.latitute * Math.PI / 180.0;
         double a = radLat1 - radLat2;
