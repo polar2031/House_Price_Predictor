@@ -2,6 +2,7 @@ import java.io.*;
 import java.util.*;
 import java.lang.Math.*;
 import org.apache.commons.math3.linear.*;
+import java.nio.file.Files;
 
 public class PricePredictor{
     ArrayList<House> samples;
@@ -47,6 +48,7 @@ public class PricePredictor{
             System.err.println("file_access_error: read sample data");
             return false;
         }
+        removeSampleData();
 
         /////////////////////
         //weight adjustment//
@@ -115,16 +117,14 @@ public class PricePredictor{
             // System.out.println(p.getColumnDimension());
             h.predictBasePrice = p.getEntry(0, 0);
         }
-        catch(SingularMatrixException sme){
-            System.err.println("SingularMatrixException");
-            h.predictBasePrice = 1.0;
+        catch(Exception e){
             return false;
         }
         return true;
     }
     private boolean readSampleFromAllData(House h){
         try{
-            File folder = new File("./houseData/");
+            File folder = new File("./temp/");
             File files[] = folder.listFiles();
             samples = new ArrayList<House>();
             for(int i = 0; i < files.length; i++){
@@ -140,6 +140,21 @@ public class PricePredictor{
             }
         }
         catch(IOException ioe){
+            return false;
+        }
+        return true;
+    }
+
+    private boolean removeSampleData(){
+        try{
+            File folder = new File("./temp/");
+            File files[] = folder.listFiles();
+            for(int i = 0; i < files.length; i++){
+                // System.err.println(files[i].toString()
+                files[i].delete();
+            }
+        }
+        catch(Exception e){
             return false;
         }
         return true;

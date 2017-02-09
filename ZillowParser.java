@@ -1,15 +1,18 @@
-import org.jsoup.Jsoup;
-import org.jsoup.helper.Validate;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import java.lang.String;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.net.MalformedURLException;
 import java.text.ParseException;
+import java.lang.String;
 import java.lang.Thread;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
+import org.jsoup.Jsoup;
+import org.jsoup.helper.Validate;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
@@ -19,8 +22,7 @@ import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.background.JavaScriptJobManager;
 
-import java.util.logging.Logger;
-import java.util.logging.Level;
+
 
 
 
@@ -29,8 +31,6 @@ public class ZillowParser{
     }
     public boolean parseNearbyHouses(House h){
         // http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/globalrelevanceex_sort/42.130232,-71.153255,42.10139,-71.193381_rect/14_zm/2_p/
-        // http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/globalrelevanceex_sort/42.112048,-71.145751,42.083248,-71.184751_rect/14_zm/1_p
-        // http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/globalrelevanceex_sort/42.112048,-71.145751,42.083248,-71.184751_rect/14_zm/1_p
         // 42.135515 - 42.106676 = 0.028839 -> +-0.0144
         // -71.154907 - -71.193874 = 0.038967 -> +-0.0195
         try{
@@ -53,6 +53,7 @@ public class ZillowParser{
             int id = 0;
             int parsePages = 1;
 
+            // stop all log from htmlunit
             Logger logger = Logger.getLogger("com.gargoylesoftware");
             logger.setLevel(Level.OFF);
 
@@ -68,10 +69,10 @@ public class ZillowParser{
                 HtmlPage page = wc.getPage(url);
                 JavaScriptJobManager manager = page.getEnclosingWindow().getJobManager();
 
+                // wait till JS done the jobs
                 // while(manager.getJobCount() > 30){
                 //     Thread.sleep(1000);
                 // }
-                // System.err.println(page.getUrl());
 
                 Document udoc;
                 Elements urlElements;
@@ -87,6 +88,7 @@ public class ZillowParser{
                 }
                 wc.close();
 
+                // get page info
                 if(i == 1){
                     Elements pageSelectElements = udoc.select("ol[class=\"zsg-pagination\"]").select("li");
                     if(!pageSelectElements.isEmpty() && pageSelectElements.size() > 1){
@@ -101,7 +103,7 @@ public class ZillowParser{
                     House tempHouse = new House();
                     if(parseHouseDetailPage(tempHouse, houseUrl)){
                         id += 1;
-                        FileWriter houseData = new FileWriter("./houseData/" + tempHouse.longtitute + "_" + tempHouse.longtitute + "_" + id + ".txt");
+                        FileWriter houseData = new FileWriter("./temp/" + tempHouse.longtitute + "_" + tempHouse.longtitute + "_" + id + ".dat");
                         tempHouse.writeToFile(houseData);
                         houseData.close();
                         urlData.write(houseUrl + "\n");
@@ -131,7 +133,7 @@ public class ZillowParser{
             String rightUrl = "/house,condo,apartment_duplex,townhouse_type/11_zm/";
             FileWriter urlData = new FileWriter("./houseUrl/" + h.zip + ".txt");
             int id = 0;
-            int parsePages = 2;
+            int parsePages = 4;
 
             for(int i = 1; i <= parsePages; i++){
                 String url = leftUrl + middleUrl + rightUrl + i + "_p";
@@ -167,6 +169,7 @@ public class ZillowParser{
         String rightUrl = "_rb/";
         String middleUrl = h.address.replaceAll("[\\s]", "-") + "-" + h.state + "-" + h.zip;
         String url = leftUrl + middleUrl + rightUrl;
+        System.err.println(url);
         return parseHouseDetailPage(h, url);
     }
 
