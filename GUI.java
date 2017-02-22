@@ -11,15 +11,15 @@ import java.io.PrintStream;
 public class GUI {
 	private JFrame f;
 	private JTextField input[];
-    private JTextArea output;
+    public JTextArea output;
     // Input columns' name
-    String name[] = {"Address",
-                     "City",
-                     "State",
-                     "Zip",
-                     "Floor Size",
-                     "Number of Bed Room",
-                     "Number of Bath Room"};
+    private String name[] = {"Address",
+							"City",
+							"State",
+							"Zip",
+							"Floor Size",
+							"Number of Bed Room",
+							"Number of Bath Room"};
 
 	public GUI(){
 		//set program style as default style of OS
@@ -27,6 +27,7 @@ public class GUI {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}
 		catch(Exception e){}
+
         // create frame with name "House Price Predictor"
 		f = new JFrame("House Price Predictor");
         // set frame size
@@ -54,41 +55,108 @@ public class GUI {
         // set input area
         GridBagConstraints c1 = new GridBagConstraints();
         input = new JTextField[name.length];
-        for(int i = 0; i < name.length; i++){
-            JLabel l1_1 = new JLabel(name[i]);
-            c1.gridx = 0;
-            c1.gridy = i;
-            c1.gridwidth = 1;
-            c1.gridheight = 1;
-            c1.weightx = 1;
-            c1.weighty = 0;
-            c1.fill = GridBagConstraints.NONE;
-            c1.anchor = GridBagConstraints.WEST;
-            p1.add(l1_1, c1);
 
-            JTextField t1_1 = new JTextField();
-            c1.gridx = 1;
-            c1.gridy = i;
-            c1.gridwidth = 10;
-            c1.gridheight = 1;
-            c1.weightx = 10;
-            c1.weighty = 0;
-            c1.fill = GridBagConstraints.BOTH;
-            c1.anchor = GridBagConstraints.WEST;
-            p1.add(t1_1, c1);
+		//address
+		JLabel l1_1 = new JLabel(name[0]);
+		c1.gridx = 0;
+		c1.gridy = 0;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 1;
+		c1.weighty = 0;
+		c1.fill = GridBagConstraints.NONE;
+		c1.anchor = GridBagConstraints.WEST;
+		p1.add(l1_1, c1);
 
-            input[i] = t1_1;
-        }
+		JTextField t1_1 = new JTextField();
+		c1.gridx = 1;
+		c1.gridy = 0;
+		c1.gridwidth = 10;
+		c1.gridheight = 1;
+		c1.weightx = 10;
+		c1.weighty = 0;
+		c1.fill = GridBagConstraints.BOTH;
+		c1.anchor = GridBagConstraints.WEST;
+		p1.add(t1_1, c1);
+		input[0] = t1_1;
+
+		//City
+		JLabel l1_2 = new JLabel(name[1]);
+		c1.gridx = 2;
+		c1.gridy = 0;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 1;
+		c1.weighty = 0;
+		c1.fill = GridBagConstraints.NONE;
+		c1.anchor = GridBagConstraints.WEST;
+		p1.add(l1_2, c1);
+
+		JTextField t1_2 = new JTextField();
+		c1.gridx = 3;
+		c1.gridy = 0;
+		c1.gridwidth = 5;
+		c1.gridheight = 1;
+		c1.weightx = 5;
+		c1.weighty = 0;
+		c1.fill = GridBagConstraints.BOTH;
+		c1.anchor = GridBagConstraints.WEST;
+		p1.add(t1_2, c1);
+		input[1] = t1_2;
+
+		//state
+		JLabel l1_3 = new JLabel(name[2]);
+		c1.gridx = 4;
+		c1.gridy = 0;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 1;
+		c1.weighty = 0;
+		c1.fill = GridBagConstraints.NONE;
+		c1.anchor = GridBagConstraints.WEST;
+		p1.add(l1_3, c1);
+
+		JTextField t1_3 = new JTextField();
+		c1.gridx = 5;
+		c1.gridy = 0;
+		c1.gridwidth = 3;
+		c1.gridheight = 1;
+		c1.weightx = 2;
+		c1.weighty = 0;
+		c1.fill = GridBagConstraints.BOTH;
+		c1.anchor = GridBagConstraints.WEST;
+		p1.add(t1_3, c1);
+		input[2] = t1_3;
+
+		//zip
+		JLabel l1_4 = new JLabel(name[3]);
+		c1.gridx = 6;
+		c1.gridy = 0;
+		c1.gridwidth = 1;
+		c1.gridheight = 1;
+		c1.weightx = 1;
+		c1.weighty = 0;
+		c1.fill = GridBagConstraints.NONE;
+		c1.anchor = GridBagConstraints.WEST;
+		p1.add(l1_4, c1);
+
+		JTextField t1_4 = new JTextField();
+		c1.gridx = 7;
+		c1.gridy = 0;
+		c1.gridwidth = 3;
+		c1.gridheight = 1;
+		c1.weightx = 3;
+		c1.weighty = 0;
+		c1.fill = GridBagConstraints.BOTH;
+		c1.anchor = GridBagConstraints.WEST;
+		p1.add(t1_4, c1);
+		input[3] = t1_4;
 
         // set default text in input columns
         input[0].setText("34 Longmeadow Ln");
         input[1].setText("Town of Sharon");
         input[2].setText("ma");
         input[3].setText("02067");
-        // input[4].setText("2116");
-        // input[5].setText("3");
-        // input[6].setText("2");
-
 
         // set button area
         JPanel p2 = new JPanel();
@@ -137,16 +205,17 @@ public class GUI {
 
     class StartLitener implements ActionListener{
         public void actionPerformed(ActionEvent event) {
-            // build target object
-
             House h = new House(input[0].getText(),
                                 input[1].getText(),
                                 input[2].getText(),
                                 input[3].getText());
 			PricePredictor p = new PricePredictor();
-			p.start(h);
+			if(p.start(h)){
+				//
+			}
+			else{
 
-
+			}
         }
     }
 }

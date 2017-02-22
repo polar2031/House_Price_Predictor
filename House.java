@@ -1,10 +1,12 @@
 import java.io.*;
+import java.util.Date;
 import java.util.Scanner;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
-import com.google.gson.*;
-import org.jsoup.*;
+// import com.google.gson.*;
+// import org.jsoup.*;
 
 public class House{
     // house address
@@ -24,7 +26,7 @@ public class House{
 
     // price
     public Double lastSoldPrice;
-    public String lastSoldDate;
+    public Date lastSoldDate;
     public Double predictBasePrice;
     public Double predictPrice;
 
@@ -48,7 +50,7 @@ public class House{
         ZillowParser z = new ZillowParser();
         return z.parseHouse(this);
     }
-
+/*
     public boolean writeToFile(FileWriter f){
         try{
             f.write(address + "\n");
@@ -94,6 +96,7 @@ public class House{
             bathroomNumber = Double.parseDouble(br.readLine());
             floorSize = Double.parseDouble(br.readLine());
             lastSoldPrice = Double.parseDouble(br.readLine());
+
             lastSoldDate = br.readLine();
             latitute = Double.parseDouble(br.readLine());
             longtitute = Double.parseDouble(br.readLine());
@@ -109,7 +112,7 @@ public class House{
         }
         return true;
     }
-
+*/
     //count distance between two houses using their coordinates
     public double getDirectDistance(House h){
         //earth ratius

@@ -3,8 +3,11 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.net.MalformedURLException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.lang.String;
 import java.lang.Thread;
+import java.util.*;
+import java.util.Date;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -22,14 +25,92 @@ import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.background.JavaScriptJobManager;
 
-
-
-
-
 public class ZillowParser{
     public ZillowParser(){
     }
-    public boolean parseNearbyHouses(House h){
+
+    public ArrayList<House> parseNearbyHouses(House h){
+        // http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/globalrelevanceex_sort/42.130232,-71.153255,42.10139,-71.193381_rect/14_zm/2_p/
+        // 42.135515 - 42.106676 = 0.028839 -> +-0.0144
+        // -71.154907 - -71.193874 = 0.038967 -> +-0.0195
+        ArrayList<House> samples = new ArrayList<House>();
+
+        // latitute and longtitute range
+        Double latituteRange = 0.0144;
+        Double longtituteRange = 0.0195;
+        DecimalFormat formatter = new DecimalFormat("#.######");
+        // formatter.applyPattern("0.000000");
+
+        String up = formatter.format(h.latitute + latituteRange);
+        String down = formatter.format(h.latitute - latituteRange);
+        String left = formatter.format(h.longtitute + longtituteRange);
+        String right = formatter.format(h.longtitute - longtituteRange);
+
+        String leftUrl = "http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/globalrelevanceex_sort/";
+        String middleUrl = up + "," + left + "," + down + "," + right;
+        String rightUrl = "_rect/14_zm/";
+
+        int parsePages = 1;
+
+        try{
+            for(int i = 1; i <= parsePages; i++){
+                String url = leftUrl + middleUrl + rightUrl + i + "_p";
+                System.out.println("get list of nearby houses from: "+ url);
+
+                // stop all log from htmlunit
+                Logger htmlUnitLogger = Logger.getLogger("com.gargoylesoftware");
+                htmlUnitLogger.setLevel(Level.OFF);
+
+                WebClient wc = new WebClient();
+                wc.getOptions().setJavaScriptEnabled(true);
+                wc.getOptions().setCssEnabled(false);
+                wc.getOptions().setThrowExceptionOnScriptError(false);
+                wc.getOptions().setTimeout(10000);
+                HtmlPage page = wc.getPage(url);
+                JavaScriptJobManager manager = page.getEnclosingWindow().getJobManager();
+
+                Document udoc;
+                Elements urlElements;
+                int errorCount = 0;
+                while(true){
+                    udoc = Jsoup.parse(page.asXml(), "http://www.zillow.com");
+                    urlElements = udoc.select("a[class=\"zsg-photo-card-overlay-link routable hdp-link routable mask hdp-link\"]");
+                    if(urlElements.isEmpty() && errorCount++ < 200){
+                        Thread.sleep(200);
+                    }
+                    else{
+                        break;
+                    }
+                }
+                wc.close();
+
+                // get page info
+                if(i == 1){
+                    Elements pageSelectElements = udoc.select("ol[class=\"zsg-pagination\"]").select("li");
+                    if(!pageSelectElements.isEmpty() && pageSelectElements.size() > 1){
+                        parsePages = Integer.parseInt(pageSelectElements.get(pageSelectElements.size() - 2).text());
+                    }
+                }
+
+                for(Element u : urlElements){
+                    String houseUrl = u.attr("abs:href");
+                    // System.err.println(houseUrl);
+                    House tempHouse = new House();
+                    if(parseHouseDetailPage(tempHouse, houseUrl)){
+                        samples.add(tempHouse);
+                    }
+                    else{
+                        continue;
+                    }
+                }
+
+            }
+        }
+        catch(Exception e){}
+        return samples;
+    }
+/*
+    public boolean parseNearbyHouses2File(House h){
         // http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/globalrelevanceex_sort/42.130232,-71.153255,42.10139,-71.193381_rect/14_zm/2_p/
         // 42.135515 - 42.106676 = 0.028839 -> +-0.0144
         // -71.154907 - -71.193874 = 0.038967 -> +-0.0195
@@ -125,7 +206,8 @@ public class ZillowParser{
         }
         return true;
     }
-
+*/
+/*
     public boolean parseSameCityHouses(House h){
         try{
             String leftUrl = "http://www.zillow.com/homes/recently_sold/";
@@ -162,18 +244,19 @@ public class ZillowParser{
         }
         return true;
     }
-
+*/
     public boolean parseHouse(House h){
         // http://www.zillow.com/homes/18-Sandy-Ridge-Cir-Sharon-MA-02067_rb/
         String leftUrl = "http://www.zillow.com/homes/";
         String rightUrl = "_rb/";
         String middleUrl = h.address.replaceAll("[\\s]", "-") + "-" + h.state + "-" + h.zip;
         String url = leftUrl + middleUrl + rightUrl;
-        System.err.println(url);
+        // System.err.println(url);
         return parseHouseDetailPage(h, url);
     }
 
-    private boolean parseHouseDetailPage(House h, String url){
+    public boolean parseHouseDetailPage(House h, String url){
+        System.out.println("get house detail from: " + url);
         try{
             Document doc = Jsoup.connect(url).get();
 
@@ -212,11 +295,15 @@ public class ZillowParser{
                                 .first()
                                 .text()
                                 .replaceAll("[^\\.^\\-^\\d]", ""));
-            h.lastSoldDate = doc.select("div[class=\"estimates\"]")
+            String lastSoldDateString = doc.select("div[class=\"estimates\"]")
                                 .select("div[class=\" home-summary-row\"]")
                                 .select("span[class=\"\"]")
                                 .first()
                                 .text();
+
+            SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yy");
+            h.lastSoldDate = sdf.parse(lastSoldDateString);
+
             //get coordinate
             Elements coordinates = doc.select("div[class=\"zsg-layout-top\"]")
                                     .select("span[itemprop=\"geo\"][itemtype=\"http://schema.org/GeoCoordinates\"]")
@@ -248,17 +335,8 @@ public class ZillowParser{
 
 
         }
-        //Abandon when error occur (e.g. house with no useful info)
-        catch(IndexOutOfBoundsException ioobe){
-            return false;
-        }
-        catch(NullPointerException npe){
-            return false;
-        }
-        catch(NumberFormatException nfe){
-            return false;
-        }
-        catch(IOException ioe){
+        //Abandon when error occur
+        catch(Exception e){
             return false;
         }
         return true;
