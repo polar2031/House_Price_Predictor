@@ -26,10 +26,6 @@ public class PricePredictor{
         }
         else{
             System.out.println("House info found on Zillow.com.");
-            // System.err.println("Floor Size: " + h.floorSize);
-            // System.err.println("Lot Size: " + h.lotSize);
-            // System.err.println("Bedroom Number" + h.bedroomNumber);
-            // System.err.println("Bathroom Number: " + h.bathroomNumber);
         }
 
         ///////////////////////////
@@ -76,7 +72,7 @@ public class PricePredictor{
         return re;
     }
     private boolean leastSquare(House h, int totalWeight){
-        
+
         int thisYear = 2017;
         //number of features
         int vNumber = 9;
@@ -165,7 +161,6 @@ public class PricePredictor{
             h.predictBasePrice = p.getEntry(0, 0);
         }
         catch(Exception e){
-            System.err.println("1");
             return false;
         }
         return true;
