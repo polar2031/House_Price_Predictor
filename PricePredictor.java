@@ -7,8 +7,7 @@ import java.nio.file.Files;
 public class PricePredictor{
     private ArrayList<House> samples;
 
-    public PricePredictor(){
-    }
+    public PricePredictor(){}
 
     public boolean start(House h){
         return this.start(h, "leastSquare");
@@ -37,15 +36,6 @@ public class PricePredictor{
             System.out.println("no nearby houses");
         }
 
-        /////////////////////////////////////
-        //read data of recently sold houses//
-        /////////////////////////////////////
-        // if(!readSampleFromAllData(h)){
-        //     System.err.println("file_access_error: read sample data");
-        //     return false;
-        // }
-        // removeSampleData();
-
         /////////////////////
         //weight adjustment//
         /////////////////////
@@ -64,9 +54,6 @@ public class PricePredictor{
                 re = leastSquare(h, totalWeight);
                 break;
         }
-        System.err.println(re);
-        System.err.println("Predict Price: " + h.predictBasePrice);
-        System.err.println("Last Sold Price: " + h.lastSoldPrice);
         System.out.println("Predict Price: " + h.predictBasePrice);
         System.out.println("Last Sold Price: " + h.lastSoldPrice);
         return re;
@@ -165,46 +152,7 @@ public class PricePredictor{
         }
         return true;
     }
-/*
-    private boolean readSampleFromAllData(House h){
-        try{
-            File folder = new File("./temp/");
-            File files[] = folder.listFiles();
-            samples = new ArrayList<House>();
-            for(int i = 0; i < files.length; i++){
-                // System.err.println(files[i].toString());
-                FileReader f = new FileReader(files[i].toString());
-                House temp = new House();
-                if(temp.readFromFile(f)){
-                    samples.add(temp);
-                    // System.err.println(samples.get(i).address);
-                    temp = new House();
-                }
-                f.close();
-            }
-        }
-        catch(IOException ioe){
-            return false;
-        }
-        return true;
-    }
-*/
-/*
-    private boolean removeSampleData(){
-        try{
-            File folder = new File("./temp/");
-            File files[] = folder.listFiles();
-            for(int i = 0; i < files.length; i++){
-                // System.err.println(files[i].toString()
-                files[i].delete();
-            }
-        }
-        catch(Exception e){
-            return false;
-        }
-        return true;
-    }
-*/
+
     private int weightAdjustment(House h){
 
         ////////////////////////////////////
@@ -219,9 +167,16 @@ public class PricePredictor{
         int totalWeight = 0;
         double pricePerSqft = 0.0;
         double totalSqft = 0.0;
+
+        System.out.println("1");
         for(int i = 0; i < samples.size(); i++){
-            pricePerSqft += samples.get(i).lastSoldPrice;
-            totalSqft += samples.get(i).floorSize;
+            if(samples.get(i).lastSoldPrice == null){
+                samples.remove(i);
+            }
+            else{
+                pricePerSqft += samples.get(i).lastSoldPrice;
+                totalSqft += samples.get(i).floorSize;
+            }
         }
         pricePerSqft = pricePerSqft / totalSqft;
 

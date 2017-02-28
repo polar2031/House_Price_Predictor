@@ -4,9 +4,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+// import java.io.IOException;
+// import java.io.OutputStream;
+// import java.io.PrintStream;
 
 public class GUI{
 	private JFrame f;
@@ -31,7 +31,7 @@ public class GUI{
         // create frame with name "House Price Predictor"
 		f = new JFrame("House Price Predictor");
         // set frame size
-        f.setSize(1200, 200);
+        f.setSize(900, 400);
         // set frame layout type
         f.setLayout(new GridBagLayout());
         // exit GUI after closing the frame
@@ -82,8 +82,8 @@ public class GUI{
 
 			//City
 			JLabel l1_2 = new JLabel(name[1]);
-			c1.gridx = 2;
-			c1.gridy = 0;
+			c1.gridx = 0;
+			c1.gridy = 1;
 			c1.gridwidth = 1;
 			c1.gridheight = 1;
 			c1.weightx = 0.2;
@@ -93,8 +93,8 @@ public class GUI{
 			p1.add(l1_2, c1);
 
 			JTextField t1_2 = new JTextField();
-			c1.gridx = 3;
-			c1.gridy = 0;
+			c1.gridx = 1;
+			c1.gridy = 1;
 			c1.gridwidth = 1;
 			c1.gridheight = 1;
 			c1.weightx = 1;
@@ -106,8 +106,8 @@ public class GUI{
 
 			//state
 			JLabel l1_3 = new JLabel(name[2]);
-			c1.gridx = 4;
-			c1.gridy = 0;
+			c1.gridx = 0;
+			c1.gridy = 2;
 			c1.gridwidth = 1;
 			c1.gridheight = 1;
 			c1.weightx = 0.2;
@@ -117,8 +117,8 @@ public class GUI{
 			p1.add(l1_3, c1);
 
 			JTextField t1_3 = new JTextField();
-			c1.gridx = 5;
-			c1.gridy = 0;
+			c1.gridx = 1;
+			c1.gridy = 2;
 			c1.gridwidth = 1;
 			c1.gridheight = 1;
 			c1.weightx = 0.1;
@@ -130,8 +130,8 @@ public class GUI{
 
 			//zip
 			JLabel l1_4 = new JLabel(name[3]);
-			c1.gridx = 6;
-			c1.gridy = 0;
+			c1.gridx = 0;
+			c1.gridy = 3;
 			c1.gridwidth = 1;
 			c1.gridheight = 1;
 			c1.weightx = 0.2;
@@ -141,8 +141,8 @@ public class GUI{
 			p1.add(l1_4, c1);
 
 			JTextField t1_4 = new JTextField();
-			c1.gridx = 7;
-			c1.gridy = 0;
+			c1.gridx = 1;
+			c1.gridy = 3;
 			c1.gridwidth = 1;
 			c1.gridheight = 1;
 			c1.weightx = 0.2;
@@ -191,12 +191,8 @@ public class GUI{
         f.add(p3, c);
 
 	        JLabel t3_1 = new JLabel("Ready");
-	        //t3_1.setEditable(false);
 	        p3.add(t3_1);
 	        status = t3_1;
-	        // PrintStream printStream = new PrintStream(new CustomOutputStream(output));
-	        // System.setOut(printStream);
-	        // System.setErr(printStream);
 
         // turn frame visible
 		f.setVisible(true);
@@ -206,12 +202,40 @@ public class GUI{
 
 		@Override
         public void actionPerformed(ActionEvent event) {
-            House h = new House(input[0].getText(),
-                                input[1].getText(),
-                                input[2].getText(),
-                                input[3].getText());
+			PredictHousePrice task = new PredictHousePrice(input, status);
+			task.execute();
+
+            // House h = new House(input[0].getText(),
+            //                     input[1].getText(),
+            //                     input[2].getText(),
+            //                     input[3].getText());
+			// PricePredictor p = new PricePredictor();
+			// // status.setText("");
+			// if(p.start(h)){
+			// 	String result = "Predict Price: " + h.predictBasePrice;
+			// 	status.setText(result);
+			// }
+			// else{
+			// 	status.setText("Oops, Something goes wrong.");
+			// }
+        }
+    }
+
+	class PredictHousePrice extends SwingWorker<Integer, Integer> {
+		private JTextField input[];
+		private JLabel status;
+
+		public PredictHousePrice(JTextField input[], JLabel status){
+			this.input = input;
+			this.status = status;
+		}
+
+		protected Integer doInBackground() throws Exception{
+			House h = new House(input[0].getText(),
+								input[1].getText(),
+								input[2].getText(),
+								input[3].getText());
 			PricePredictor p = new PricePredictor();
-			// status.setText("");
 			if(p.start(h)){
 				String result = "Predict Price: " + h.predictBasePrice;
 				status.setText(result);
@@ -219,6 +243,9 @@ public class GUI{
 			else{
 				status.setText("Oops, Something goes wrong.");
 			}
-        }
-    }
+			return 0;
+		}
+	}
+
+
 }

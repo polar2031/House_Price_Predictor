@@ -9,13 +9,6 @@ public class Tester{
 
     public boolean start(){
         try{
-            Logger logger = Logger.getLogger("test");
-            FileHandler handler = new FileHandler("./testResult.log",true);
-            logger.addHandler(handler);
-            logger.setLevel(Level.ALL);
-            SimpleFormatter formatter = new SimpleFormatter();
-            handler.setFormatter(formatter);
-
             File folder = new File("./houseUrl/");
             File files[] = folder.listFiles();
             for(int i = 0; i < files.length; i++){
@@ -28,8 +21,6 @@ public class Tester{
                     z.parseHouseDetailPage(h, url);
                     PricePredictor p = new PricePredictor();
                     p.start(h);
-                    logger.info(String.valueOf(h.lastSoldPrice));
-                    logger.info(String.valueOf(h.predictBasePrice));
                 }
                 f.close();
             }
