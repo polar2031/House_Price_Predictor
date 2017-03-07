@@ -108,142 +108,7 @@ public class ZillowParser{
         catch(Exception e){}
         return samples;
     }
-/*
-    public boolean parseNearbyHouses2File(House h){
-        // http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/globalrelevanceex_sort/42.130232,-71.153255,42.10139,-71.193381_rect/14_zm/2_p/
-        // 42.135515 - 42.106676 = 0.028839 -> +-0.0144
-        // -71.154907 - -71.193874 = 0.038967 -> +-0.0195
-        try{
-            // latitute and longtitute range
-            Double latituteRange = 0.0144;
-            Double longtituteRange = 0.0195;
-            DecimalFormat formatter = new DecimalFormat("#.######");
-            // formatter.applyPattern("0.000000");
 
-            String up = formatter.format(h.latitute + latituteRange);
-            String down = formatter.format(h.latitute - latituteRange);
-            String left = formatter.format(h.longtitute + longtituteRange);
-            String right = formatter.format(h.longtitute - longtituteRange);
-
-            String leftUrl = "http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/globalrelevanceex_sort/";
-            String middleUrl = up + "," + left + "," + down + "," + right;
-            String rightUrl = "_rect/14_zm/";
-
-            FileWriter urlData = new FileWriter("./houseUrl/" + h.zip + ".txt");
-            int id = 0;
-            int parsePages = 1;
-
-            // stop all log from htmlunit
-            Logger logger = Logger.getLogger("com.gargoylesoftware");
-            logger.setLevel(Level.OFF);
-
-            for(int i = 1; i <= parsePages; i++){
-                String url = leftUrl + middleUrl + rightUrl + i + "_p";
-                System.err.println(url);
-
-                WebClient wc = new WebClient();
-                wc.getOptions().setJavaScriptEnabled(true);
-                wc.getOptions().setCssEnabled(false);
-                wc.getOptions().setThrowExceptionOnScriptError(false);
-                wc.getOptions().setTimeout(10000);
-                HtmlPage page = wc.getPage(url);
-                JavaScriptJobManager manager = page.getEnclosingWindow().getJobManager();
-
-                // wait till JS done the jobs
-                // while(manager.getJobCount() > 30){
-                //     Thread.sleep(1000);
-                // }
-
-                Document udoc;
-                Elements urlElements;
-                while(true){
-                    udoc = Jsoup.parse(page.asXml(), "http://www.zillow.com");
-                    urlElements = udoc.select("a[class=\"zsg-photo-card-overlay-link routable hdp-link routable mask hdp-link\"]");
-                    if(urlElements.isEmpty()){
-                        Thread.sleep(200);
-                    }
-                    else{
-                        break;
-                    }
-                }
-                wc.close();
-
-                // get page info
-                if(i == 1){
-                    Elements pageSelectElements = udoc.select("ol[class=\"zsg-pagination\"]").select("li");
-                    if(!pageSelectElements.isEmpty() && pageSelectElements.size() > 1){
-                        // System.err.println(pageSelectElements.get(pageSelectElements.size() - 2).text());
-                        parsePages = Integer.parseInt(pageSelectElements.get(pageSelectElements.size() - 2).text());
-                    }
-                }
-
-                for(Element u : urlElements){
-                    String houseUrl = u.attr("abs:href");
-                    System.err.println(houseUrl);
-                    House tempHouse = new House();
-                    if(parseHouseDetailPage(tempHouse, houseUrl)){
-                        id += 1;
-                        FileWriter houseData = new FileWriter("./temp/" + tempHouse.longtitute + "_" + tempHouse.longtitute + "_" + id + ".dat");
-                        tempHouse.writeToFile(houseData);
-                        houseData.close();
-                        urlData.write(houseUrl + "\n");
-                    }
-                    else{
-                        continue;
-                    }
-                }
-
-            }
-            urlData.close();
-        }
-        catch(IOException ioe){
-            System.err.println("file_access_error");
-            return false;
-        }
-        catch(Exception e){
-            return false;
-        }
-        return true;
-    }
-*/
-/*
-    public boolean parseSameCityHouses(House h){
-        try{
-            String leftUrl = "http://www.zillow.com/homes/recently_sold/";
-            String middleUrl = h.city + "-" + h.state + "-" + h.zip;
-            String rightUrl = "/house,condo,apartment_duplex,townhouse_type/11_zm/";
-            FileWriter urlData = new FileWriter("./houseUrl/" + h.zip + ".txt");
-            int id = 0;
-            int parsePages = 4;
-
-            for(int i = 1; i <= parsePages; i++){
-                String url = leftUrl + middleUrl + rightUrl + i + "_p";
-                Document udoc = Jsoup.connect(url).get();
-                Elements urlElements = udoc.select("a[class=\"zsg-photo-card-overlay-link routable hdp-link routable mask hdp-link\"]");
-                for(Element u : urlElements){
-                    String houseUrl = u.attr("abs:href");
-                    House tempHouse = new House();
-                    if(parseHouseDetailPage(tempHouse, houseUrl)){
-                        id += 1;
-                        FileWriter houseData = new FileWriter("./houseData/" + tempHouse.longtitute + "_" + tempHouse.longtitute + "_" + id + ".txt");
-                        tempHouse.writeToFile(houseData);
-                        houseData.close();
-                        urlData.write(houseUrl + "\n");
-                    }
-                    else{
-                        continue;
-                    }
-                }
-            }
-            urlData.close();
-        }
-        catch(IOException ioe){
-            System.err.println("file_access_error");
-            return false;
-        }
-        return true;
-    }
-*/
     public boolean parseHouse(House h){
         // http://www.zillow.com/homes/18-Sandy-Ridge-Cir-Sharon-MA-02067_rb/
         String leftUrl = "http://www.zillow.com/homes/";
@@ -350,6 +215,7 @@ public class ZillowParser{
             h.lotSize = 0;
             for(String feature : h.features){
                 if(feature.matches("Lot:(.*)acres")){
+                    //1acre = 43560sqft
                     h.lotSize = Double.parseDouble(feature.replaceAll("[^\\.^\\-^\\d]", "")) * 43560;
                 }
                 else if(feature.matches("Lot:(.*)sqft")){

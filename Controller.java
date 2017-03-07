@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.event.*;
+import java.text.DecimalFormat;
+
 
 public class Controller{
     private Model m;
@@ -56,7 +58,9 @@ public class Controller{
             return 0;
         }
         protected void done(){
-            String result = "Predict Price: " + m.target.predictBasePrice;
+            DecimalFormat formatter = new DecimalFormat("0.00");
+            String result = "Predict Price: " + formatter.format(m.target.predictBasePrice);
+            
             status.setText(result);
             startButton.setEnabled(true);
         }

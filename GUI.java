@@ -14,10 +14,16 @@ public class GUI{
 							"City",
 							"State",
 							"Zip",
-							"Floor Size",
-							"Number of Bed Room",
-							"Number of Bath Room"};
-
+							"Floor Size"};
+	private String houseInfo[] = {"Floor Size",
+								"Lot Size",
+								"Bedroom",
+								"Bathroom",
+								"Built Year",
+								"Last Sold time",
+								"Last Sold Price",
+								"predict Price"
+							}
 
 	public GUI(){
 		//set program style as default style of OS
@@ -39,13 +45,13 @@ public class GUI{
         JPanel p1 = new JPanel();
         p1.setLayout(new GridBagLayout());
 		// EmptyBorder(up, left, down, right)
-		p1.setBorder(new EmptyBorder(0,20,0,20));
+		p1.setBorder(new EmptyBorder(20,20,0,20));
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 1;
         c.gridheight = 1;
         c.weightx = 1;
-        c.weighty = 1;
+        c.weighty = 0;
         c.fill = GridBagConstraints.BOTH;
         c.anchor = GridBagConstraints.CENTER;
         f.add(p1, c);
@@ -152,7 +158,7 @@ public class GUI{
 
 	        // set default text in input columns
 	        input[0].setText("34 Longmeadow Ln");
-	        input[1].setText("Town of Sharon");
+	        input[1].setText("Sharon");
 	        input[2].setText("ma");
 	        input[3].setText("02067");
 
@@ -165,7 +171,7 @@ public class GUI{
         c.gridwidth = 1;
         c.gridheight = 1;
         c.weightx = 0;
-        c.weighty = 1;
+        c.weighty = 0;
         c.fill = GridBagConstraints.BOTH;
         c.anchor = GridBagConstraints.CENTER;
         f.add(p2, c);
@@ -179,7 +185,7 @@ public class GUI{
 
         // set output area
         JPanel p3 = new JPanel();
-        p3.setLayout(new BorderLayout(5, 5));
+        p3.setLayout(new GridBagLayout());
 		p3.setBorder(new EmptyBorder(0,20,20,20));
         c.gridx = 0;
         c.gridy = 2;
@@ -191,9 +197,46 @@ public class GUI{
         c.anchor = GridBagConstraints.WEST;
         f.add(p3, c);
 
-	        JLabel t3_1 = new JLabel("Ready");
-	        p3.add(t3_1);
-	        status = t3_1;
+			GridBagConstraints c3 = new GridBagConstraints();
+
+			JLabel l3_1 = new JLabel("Floor Size: ");
+			c3.gridx = 0;
+			c3.gridy = 0;
+			c3.gridwidth = 1;
+			c3.gridheight = 1;
+			c3.weightx = 0.2;
+			c3.weighty = 0;
+			c3.fill = GridBagConstraints.NONE;
+			c3.anchor = GridBagConstraints.CENTER;
+			p3.add(l3_1, c3);
+
+		JPanel p4 = new JPanel();
+        p4.setLayout(new GridBagLayout());
+		p4.setBorder(new EmptyBorder(0,10,10,10));
+        c.gridx = 0;
+        c.gridy = 3;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.weightx = 1;
+        c.weighty = 0;
+        c.fill = GridBagConstraints.BOTH;
+        c.anchor = GridBagConstraints.WEST;
+        f.add(p4, c);
+
+			GridBagConstraints c4 = new GridBagConstraints();
+
+	        JLabel l4_1 = new JLabel("Ready");
+			// l4_1.setBorder(BorderFactory.createLoweredBevelBorder());
+			c4.gridx = 0;
+			c4.gridy = 0;
+			c4.gridwidth = 1;
+			c4.gridheight = 1;
+			c4.weightx = 1;
+			c4.weighty = 1;
+			c4.fill = GridBagConstraints.BOTH;
+			c4.anchor = GridBagConstraints.WEST;
+	        p4.add(l4_1, c4);
+	        status = l4_1;
 
 	}
 
