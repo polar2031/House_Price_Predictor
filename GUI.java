@@ -2,16 +2,13 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
-
-// import java.io.IOException;
-// import java.io.OutputStream;
-// import java.io.PrintStream;
 
 public class GUI{
-	private JFrame f;
-	private JTextField input[];
+	public JFrame f;
+	public JTextField input[];
     public JLabel status;
+    public JButton startButton;
+
     // Input columns' name
     private String name[] = {"Address",
 							"City",
@@ -20,6 +17,7 @@ public class GUI{
 							"Floor Size",
 							"Number of Bed Room",
 							"Number of Bath Room"};
+
 
 	public GUI(){
 		//set program style as default style of OS
@@ -71,7 +69,7 @@ public class GUI{
 			JTextField t1_1 = new JTextField();
 			c1.gridx = 1;
 			c1.gridy = 0;
-			c1.gridwidth = 1;
+			c1.gridwidth = 5;
 			c1.gridheight = 1;
 			c1.weightx = 3;
 			c1.weighty = 0;
@@ -106,8 +104,8 @@ public class GUI{
 
 			//state
 			JLabel l1_3 = new JLabel(name[2]);
-			c1.gridx = 0;
-			c1.gridy = 2;
+			c1.gridx = 2;
+			c1.gridy = 1;
 			c1.gridwidth = 1;
 			c1.gridheight = 1;
 			c1.weightx = 0.2;
@@ -117,8 +115,8 @@ public class GUI{
 			p1.add(l1_3, c1);
 
 			JTextField t1_3 = new JTextField();
-			c1.gridx = 1;
-			c1.gridy = 2;
+			c1.gridx = 3;
+			c1.gridy = 1;
 			c1.gridwidth = 1;
 			c1.gridheight = 1;
 			c1.weightx = 0.1;
@@ -130,8 +128,8 @@ public class GUI{
 
 			//zip
 			JLabel l1_4 = new JLabel(name[3]);
-			c1.gridx = 0;
-			c1.gridy = 3;
+			c1.gridx = 4;
+			c1.gridy = 1;
 			c1.gridwidth = 1;
 			c1.gridheight = 1;
 			c1.weightx = 0.2;
@@ -141,8 +139,8 @@ public class GUI{
 			p1.add(l1_4, c1);
 
 			JTextField t1_4 = new JTextField();
-			c1.gridx = 1;
-			c1.gridy = 3;
+			c1.gridx = 5;
+			c1.gridy = 1;
 			c1.gridwidth = 1;
 			c1.gridheight = 1;
 			c1.weightx = 0.2;
@@ -173,8 +171,11 @@ public class GUI{
         f.add(p2, c);
 
 	        JButton b2_1 = new JButton("start");
+			startButton = b2_1;
 	        p2.add(b2_1);
-	        b2_1.addActionListener(new StartLitener());
+
+			JButton b2_2 = new JButton("cancel");
+			p2.add(b2_2);
 
         // set output area
         JPanel p3 = new JPanel();
@@ -194,58 +195,15 @@ public class GUI{
 	        p3.add(t3_1);
 	        status = t3_1;
 
-        // turn frame visible
-		f.setVisible(true);
 	}
 
-    class StartLitener implements ActionListener{
-
-		@Override
-        public void actionPerformed(ActionEvent event) {
-			PredictHousePrice task = new PredictHousePrice(input, status);
-			task.execute();
-
-            // House h = new House(input[0].getText(),
-            //                     input[1].getText(),
-            //                     input[2].getText(),
-            //                     input[3].getText());
-			// PricePredictor p = new PricePredictor();
-			// // status.setText("");
-			// if(p.start(h)){
-			// 	String result = "Predict Price: " + h.predictBasePrice;
-			// 	status.setText(result);
-			// }
-			// else{
-			// 	status.setText("Oops, Something goes wrong.");
-			// }
-        }
+    public void addStartListener(ActionListener start){
+        startButton.addActionListener(start);
     }
-
-	class PredictHousePrice extends SwingWorker<Integer, Integer> {
-		private JTextField input[];
-		private JLabel status;
-
-		public PredictHousePrice(JTextField input[], JLabel status){
-			this.input = input;
-			this.status = status;
-		}
-
-		protected Integer doInBackground() throws Exception{
-			House h = new House(input[0].getText(),
-								input[1].getText(),
-								input[2].getText(),
-								input[3].getText());
-			PricePredictor p = new PricePredictor();
-			if(p.start(h)){
-				String result = "Predict Price: " + h.predictBasePrice;
-				status.setText(result);
-			}
-			else{
-				status.setText("Oops, Something goes wrong.");
-			}
-			return 0;
-		}
-	}
+    public void addCancelListener(ActionListener cancel){}
 
 
+    public void show(){
+        f.setVisible(true);
+    }
 }

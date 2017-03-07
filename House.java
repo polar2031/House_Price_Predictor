@@ -1,9 +1,5 @@
 import java.io.*;
 import java.util.Date;
-import java.util.Scanner;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 
 // import com.google.gson.*;
 // import org.jsoup.*;
@@ -24,9 +20,12 @@ public class House{
     public double longtitute;
     public int builtYear;
 
-    // price
+    // sold info
+    public boolean recentlySold;
     public Double lastSoldPrice;
     public Date lastSoldDate;
+
+    // price
     public Double predictBasePrice;
     public Double predictPrice;
 
@@ -50,72 +49,10 @@ public class House{
         ZillowParser z = new ZillowParser();
         return z.parseHouse(this);
     }
-/*
-    public boolean writeToFile(FileWriter f){
-        try{
-            f.write(address + "\n");
-            f.write(city + "\n");
-            f.write(state + "\n");
-            f.write(zip + "\n");
-            f.write(String.valueOf(bedroomNumber) + "\n");
-            f.write(String.valueOf(bathroomNumber) + "\n");
-            f.write(String.valueOf(floorSize) + "\n");
-            f.write(String.valueOf(lastSoldPrice) + "\n");
-            f.write(lastSoldDate + "\n");
-            f.write(String.valueOf(latitute) + "\n");
-            f.write(String.valueOf(longtitute) + "\n");
-            f.write(String.valueOf(builtYear) + "\n");
-            if(features != null){
-                f.write(String.valueOf(features.length) + "\n");
-                for(int i = 0; i < features.length; i++){
-                    f.write(features[i] + "\n");
-                }
-            }
-            else{
-                f.write("0\n");
-            }
-            f.write("\n");
-        }
-        catch(IOException ioe){
-            return false;
-        }
-        return true;
-    }
 
-    public boolean readFromFile(FileReader f){
-        try{
-            BufferedReader br = new BufferedReader(f);
-            String line = null;
-			String[] tempTrainData = null;
-
-            address = br.readLine();
-            city = br.readLine();
-            state = br.readLine();
-            zip = br.readLine();
-            bedroomNumber = Double.parseDouble(br.readLine());
-            bathroomNumber = Double.parseDouble(br.readLine());
-            floorSize = Double.parseDouble(br.readLine());
-            lastSoldPrice = Double.parseDouble(br.readLine());
-
-            lastSoldDate = br.readLine();
-            latitute = Double.parseDouble(br.readLine());
-            longtitute = Double.parseDouble(br.readLine());
-            builtYear = Integer.parseInt(br.readLine());
-            features = new String[Integer.parseInt(br.readLine())];
-            for(int i = 0; i < features.length; i++){
-                features[i] = br.readLine();
-            }
-            br.readLine();
-        }
-        catch(IOException ioe){
-            return false;
-        }
-        return true;
-    }
-*/
     //count distance between two houses using their coordinates
     public double getDirectDistance(House h){
-        //earth ratius
+        //earth radius
         //6378.137 km = 3963.1906 mile
         double EARTH_RADIUS = 3963.1906;
         double radLat1 = h.latitute * Math.PI / 180.0;
@@ -125,7 +62,6 @@ public class House{
         double s = 2.0 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) + Math.cos(radLat1)*Math.cos(radLat2)*Math.pow(Math.sin(b/2),2)));
         s = s * EARTH_RADIUS;
         s = Math.round(s * 10000.0) / 10000.0;
-        // System.out.println(s);
         return s;
     }
 

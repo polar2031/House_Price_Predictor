@@ -1,4 +1,3 @@
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.net.MalformedURLException;
@@ -270,10 +269,10 @@ public class ZillowParser{
             h.state = fullAddress.split(",")[2].split(" ")[1].trim();
             h.zip = fullAddress.split(",")[2].split(" ")[2].trim();
 
-            System.out.println(h.address);
-            System.out.println(h.city);
-            System.out.println(h.state);
-            System.out.println(h.zip);
+            // System.out.println(h.address);
+            // System.out.println(h.city);
+            // System.out.println(h.state);
+            // System.out.println(h.zip);
 
             if(h.address == null || h.city == null || h.state == null || h.zip == null){
                 return false;
@@ -315,8 +314,8 @@ public class ZillowParser{
 
             SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yy");
             h.lastSoldDate = sdf.parse(lastSoldDateString);
-            System.out.println(h.lastSoldPrice);
-            System.out.println(lastSoldDateString);
+            // System.out.println(h.lastSoldPrice);
+            // System.out.println(lastSoldDateString);
         }
         catch(Exception e){}
         try{
@@ -337,8 +336,8 @@ public class ZillowParser{
             }
             h.latitute = Double.parseDouble(coordinates.first().attr("content").replaceAll("[^\\.^\\-^\\d]", ""));
             h.longtitute = Double.parseDouble(coordinates.last().attr("content").replaceAll("[^\\.^\\-^\\d]", ""));
-            System.out.println(h.latitute);
-            System.out.println(h.longtitute);
+            // System.out.println(h.latitute);
+            // System.out.println(h.longtitute);
 
             //get features and features
             Elements featureElements = doc.select("ul[class=\"zsg-list_square zsg-lg-1-3 zsg-md-1-2 zsg-sm-1-1\"]")
