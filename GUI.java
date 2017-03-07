@@ -6,8 +6,11 @@ import java.awt.event.*;
 public class GUI{
 	public JFrame f;
 	public JTextField input[];
-    public JLabel status;
     public JButton startButton;
+	public JButton cancelButton;
+	public JTextField targetHouseInfo[];
+	public JTextArea sampleList;
+	public JLabel status;
 
     // Input columns' name
     private String name[] = {"Address",
@@ -23,7 +26,7 @@ public class GUI{
 								"Last Sold time",
 								"Last Sold Price",
 								"predict Price"
-							}
+							};
 
 	public GUI(){
 		//set program style as default style of OS
@@ -35,7 +38,7 @@ public class GUI{
         // create frame with name "House Price Predictor"
 		f = new JFrame("House Price Predictor");
         // set frame size
-        f.setSize(900, 400);
+        f.setSize(900, 600);
         // set frame layout type
         f.setLayout(new GridBagLayout());
         // exit GUI after closing the frame
@@ -181,6 +184,8 @@ public class GUI{
 	        p2.add(b2_1);
 
 			JButton b2_2 = new JButton("cancel");
+			cancelButton = b2_2;
+			cancelButton.setEnabled(false);
 			p2.add(b2_2);
 
         // set output area
@@ -198,17 +203,48 @@ public class GUI{
         f.add(p3, c);
 
 			GridBagConstraints c3 = new GridBagConstraints();
+			for(int i = 0; i < houseInfo.length; i++){
+				JLabel l3_1 = new JLabel(houseInfo[i]);
+				c3.gridx = 0;
+				c3.gridy = i;
+				c3.gridwidth = 1;
+				c3.gridheight = 1;
+				c3.weightx = 0.1;
+				c3.weighty = 1;
+				c3.fill = GridBagConstraints.NONE;
+				c3.anchor = GridBagConstraints.WEST;
+				p3.add(l3_1, c3);
+			}
+			targetHouseInfo = new JTextField[houseInfo.length];
+			for(int i = 0; i < houseInfo.length; i++){
+				JTextField t3_1 = new JTextField();
+				t3_1.setEditable(false);
+				targetHouseInfo[i] = t3_1;
+				c3.gridx = 1;
+				c3.gridy = i;
+				c3.gridwidth = 1;
+				c3.gridheight = 1;
+				c3.weightx = 0.4;
+				c3.weighty = 0;
+				c3.fill = GridBagConstraints.HORIZONTAL;
+				c3.anchor = GridBagConstraints.WEST;
+				p3.add(t3_1, c3);
+			}
 
-			JLabel l3_1 = new JLabel("Floor Size: ");
-			c3.gridx = 0;
+			JTextArea t3_2 = new JTextArea("");
+			sampleList = t3_2;
+			t3_2.setEditable(false);
+			JScrollPane s3_2 = new JScrollPane(t3_2);
+
+			c3.gridx = 2;
 			c3.gridy = 0;
 			c3.gridwidth = 1;
-			c3.gridheight = 1;
-			c3.weightx = 0.2;
-			c3.weighty = 0;
-			c3.fill = GridBagConstraints.NONE;
-			c3.anchor = GridBagConstraints.CENTER;
-			p3.add(l3_1, c3);
+			c3.gridheight = houseInfo.length;
+			c3.weightx = 1;
+			c3.weighty = 0.5;
+			c3.fill = GridBagConstraints.BOTH;
+			c3.anchor = GridBagConstraints.NORTHWEST;
+			p3.add(s3_2, c3);
 
 		JPanel p4 = new JPanel();
         p4.setLayout(new GridBagLayout());
@@ -243,7 +279,9 @@ public class GUI{
     public void addStartListener(ActionListener start){
         startButton.addActionListener(start);
     }
-    public void addCancelListener(ActionListener cancel){}
+    public void addCancelListener(ActionListener cancel){
+		cancelButton.addActionListener(cancel);
+	}
 
 
     public void show(){

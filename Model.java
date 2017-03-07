@@ -26,7 +26,7 @@ public class Model{
         ArrayList<House> hs = z.parseNearbyHouses(target);
         //remove target house from samples
         for(int i = 0; i < hs.size(); i++){
-            if(hs.get(i).address == target.address){
+            if(hs.get(i).address.trim().equals(target.address.trim())){
                 hs.remove(i);
                 System.out.println("remove target from sample");
                 break;
