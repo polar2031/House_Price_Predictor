@@ -1,9 +1,12 @@
+package predictor.gui;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class GUI{
+
+public class GUI {
 	public JFrame f;
 	public JTextField input[];
     public JButton startButton;
@@ -45,6 +48,15 @@ public class GUI{
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         GridBagConstraints c = new GridBagConstraints();
+
+
+		/*
+		██ ███    ██ ██████  ██    ██ ████████      █████  ██████  ███████  █████
+		██ ████   ██ ██   ██ ██    ██    ██        ██   ██ ██   ██ ██      ██   ██
+		██ ██ ██  ██ ██████  ██    ██    ██        ███████ ██████  █████   ███████
+		██ ██  ██ ██ ██      ██    ██    ██        ██   ██ ██   ██ ██      ██   ██
+		██ ██   ████ ██       ██████     ██        ██   ██ ██   ██ ███████ ██   ██
+		*/
         JPanel p1 = new JPanel();
         p1.setLayout(new GridBagLayout());
 		// EmptyBorder(up, left, down, right)
@@ -59,7 +71,6 @@ public class GUI{
         c.anchor = GridBagConstraints.CENTER;
         f.add(p1, c);
 
-	        // set input area
 	        GridBagConstraints c1 = new GridBagConstraints();
 	        input = new JTextField[name.length];
 
@@ -160,12 +171,19 @@ public class GUI{
 			input[3] = t1_4;
 
 	        // set default text in input columns
-	        input[0].setText("34 Longmeadow Ln");
+	        input[0].setText("2 ginger way");
 	        input[1].setText("Sharon");
 	        input[2].setText("ma");
 	        input[3].setText("02067");
 
-        // set button area
+		/*
+		██████  ██    ██ ████████ ████████  ██████  ███    ██      █████  ██████  ███████  █████
+		██   ██ ██    ██    ██       ██    ██    ██ ████   ██     ██   ██ ██   ██ ██      ██   ██
+		██████  ██    ██    ██       ██    ██    ██ ██ ██  ██     ███████ ██████  █████   ███████
+		██   ██ ██    ██    ██       ██    ██    ██ ██  ██ ██     ██   ██ ██   ██ ██      ██   ██
+		██████   ██████     ██       ██     ██████  ██   ████     ██   ██ ██   ██ ███████ ██   ██
+		*/
+
         JPanel p2 = new JPanel();
         p2.setLayout(new GridBagLayout());
 		p2.setBorder(new EmptyBorder(10,20,10,20));
@@ -188,7 +206,14 @@ public class GUI{
 			cancelButton.setEnabled(false);
 			p2.add(b2_2);
 
-        // set output area
+		/*
+		 ██████  ██    ██ ████████ ██████  ██    ██ ████████      █████  ██████  ███████  █████
+		██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ██   ██ ██   ██ ██      ██   ██
+		██    ██ ██    ██    ██    ██████  ██    ██    ██        ███████ ██████  █████   ███████
+		██    ██ ██    ██    ██    ██      ██    ██    ██        ██   ██ ██   ██ ██      ██   ██
+		 ██████   ██████     ██    ██       ██████     ██        ██   ██ ██   ██ ███████ ██   ██
+		*/
+
         JPanel p3 = new JPanel();
         p3.setLayout(new GridBagLayout());
 		p3.setBorder(new EmptyBorder(0,20,20,20));
@@ -235,6 +260,7 @@ public class GUI{
 			sampleList = t3_2;
 			t3_2.setEditable(false);
 			JScrollPane s3_2 = new JScrollPane(t3_2);
+			s3_2.setBorder(new EmptyBorder(10,10,10,10));
 
 			c3.gridx = 2;
 			c3.gridy = 0;
@@ -245,6 +271,14 @@ public class GUI{
 			c3.fill = GridBagConstraints.BOTH;
 			c3.anchor = GridBagConstraints.NORTHWEST;
 			p3.add(s3_2, c3);
+
+		/*
+		███████ ████████  █████  ████████ ██    ██ ███████
+		██         ██    ██   ██    ██    ██    ██ ██
+		███████    ██    ███████    ██    ██    ██ ███████
+		     ██    ██    ██   ██    ██    ██    ██      ██
+		███████    ██    ██   ██    ██     ██████  ███████
+		*/
 
 		JPanel p4 = new JPanel();
         p4.setLayout(new GridBagLayout());
@@ -282,9 +316,27 @@ public class GUI{
     public void addCancelListener(ActionListener cancel){
 		cancelButton.addActionListener(cancel);
 	}
-
-
     public void show(){
         f.setVisible(true);
     }
+	public void clean(){
+		for(int i = 0; i < houseInfo.length; i++){
+			targetHouseInfo[i].setText("");
+		}
+		sampleList.setText("");
+		status.setText("Ready");
+	}
+	
+	public String getInputAddress(){
+		return input[0].getText();
+	}
+	public String getInputCity(){
+		return input[1].getText();
+	}
+	public String getInputState(){
+		return input[2].getText();
+	}
+	public String getInputZip(){
+		return input[3].getText();
+	}
 }
