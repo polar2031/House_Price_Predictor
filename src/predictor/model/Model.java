@@ -64,11 +64,7 @@ public class Model {
     	return true;
     	
     }
-    public ArrayList<House> readFromData(File f){
-    	ArrayList<House> hs = new ArrayList<House>();
-    	
-    	return hs;
-    }
+
 	public ArrayList<String> getSampleDataList() throws Exception{
 		double range = 1;
 		
@@ -170,4 +166,6 @@ public class Model {
         System.out.println(sampleList.size());
         return;
     }
+    
+    
 }
