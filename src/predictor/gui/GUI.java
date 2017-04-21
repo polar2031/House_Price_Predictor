@@ -61,14 +61,7 @@ public class GUI {
         p1.setLayout(new GridBagLayout());
 		// EmptyBorder(up, left, down, right)
 		p1.setBorder(new EmptyBorder(20,20,0,20));
-        c.gridx = 0;
-        c.gridy = 0;
-        c.gridwidth = 1;
-        c.gridheight = 1;
-        c.weightx = 1;
-        c.weighty = 0;
-        c.fill = GridBagConstraints.BOTH;
-        c.anchor = GridBagConstraints.CENTER;
+		setGridBagConstraints(c, 0, 0, 1, 1, 1, 0, GridBagConstraints.BOTH, GridBagConstraints.CENTER);
         f.add(p1, c);
 
 	        GridBagConstraints c1 = new GridBagConstraints();
@@ -76,97 +69,41 @@ public class GUI {
 
 			//address
 			JLabel l1_1 = new JLabel(name[0]);
-			c1.gridx = 0;
-			c1.gridy = 0;
-			c1.gridwidth = 1;
-			c1.gridheight = 1;
-			c1.weightx = 0.2;
-			c1.weighty = 0;
-			c1.fill = GridBagConstraints.NONE;
-			c1.anchor = GridBagConstraints.CENTER;
+			setGridBagConstraints(c1, 0, 0, 1, 1, 0.2, 0, GridBagConstraints.NONE, GridBagConstraints.CENTER);
 			p1.add(l1_1, c1);
 
 			JTextField t1_1 = new JTextField();
-			c1.gridx = 1;
-			c1.gridy = 0;
-			c1.gridwidth = 5;
-			c1.gridheight = 1;
-			c1.weightx = 3;
-			c1.weighty = 0;
-			c1.fill = GridBagConstraints.BOTH;
-			c1.anchor = GridBagConstraints.WEST;
+			setGridBagConstraints(c1, 1, 0, 5, 1, 3, 0, GridBagConstraints.BOTH, GridBagConstraints.WEST);
 			p1.add(t1_1, c1);
 			input[0] = t1_1;
 
 			//City
 			JLabel l1_2 = new JLabel(name[1]);
-			c1.gridx = 0;
-			c1.gridy = 1;
-			c1.gridwidth = 1;
-			c1.gridheight = 1;
-			c1.weightx = 0.2;
-			c1.weighty = 0;
-			c1.fill = GridBagConstraints.NONE;
-			c1.anchor = GridBagConstraints.CENTER;
+			setGridBagConstraints(c1, 0, 1, 1, 1, 0.2, 0, GridBagConstraints.NONE, GridBagConstraints.CENTER);
 			p1.add(l1_2, c1);
 
 			JTextField t1_2 = new JTextField();
-			c1.gridx = 1;
-			c1.gridy = 1;
-			c1.gridwidth = 1;
-			c1.gridheight = 1;
-			c1.weightx = 1;
-			c1.weighty = 0;
-			c1.fill = GridBagConstraints.BOTH;
-			c1.anchor = GridBagConstraints.WEST;
+			setGridBagConstraints(c1, 1, 1, 1, 1, 1, 0, GridBagConstraints.BOTH, GridBagConstraints.WEST);
 			p1.add(t1_2, c1);
 			input[1] = t1_2;
 
 			//state
 			JLabel l1_3 = new JLabel(name[2]);
-			c1.gridx = 2;
-			c1.gridy = 1;
-			c1.gridwidth = 1;
-			c1.gridheight = 1;
-			c1.weightx = 0.2;
-			c1.weighty = 0;
-			c1.fill = GridBagConstraints.NONE;
-			c1.anchor = GridBagConstraints.CENTER;
+			setGridBagConstraints(c1, 2, 1, 1, 1, 0.2, 0, GridBagConstraints.NONE, GridBagConstraints.CENTER);
 			p1.add(l1_3, c1);
 
 			JTextField t1_3 = new JTextField();
-			c1.gridx = 3;
-			c1.gridy = 1;
-			c1.gridwidth = 1;
-			c1.gridheight = 1;
-			c1.weightx = 0.1;
-			c1.weighty = 0;
-			c1.fill = GridBagConstraints.BOTH;
-			c1.anchor = GridBagConstraints.WEST;
+			setGridBagConstraints(c1, 3, 1, 1, 1, 0.1, 0, GridBagConstraints.BOTH, GridBagConstraints.WEST);
 			p1.add(t1_3, c1);
 			input[2] = t1_3;
 
 			//zip
 			JLabel l1_4 = new JLabel(name[3]);
-			c1.gridx = 4;
-			c1.gridy = 1;
-			c1.gridwidth = 1;
-			c1.gridheight = 1;
-			c1.weightx = 0.2;
-			c1.weighty = 0;
-			c1.fill = GridBagConstraints.NONE;
-			c1.anchor = GridBagConstraints.CENTER;
+			setGridBagConstraints(c1, 4, 1, 1, 1, 0.2, 0, GridBagConstraints.NONE, GridBagConstraints.CENTER);
 			p1.add(l1_4, c1);
 
 			JTextField t1_4 = new JTextField();
-			c1.gridx = 5;
-			c1.gridy = 1;
-			c1.gridwidth = 1;
-			c1.gridheight = 1;
-			c1.weightx = 0.2;
-			c1.weighty = 0;
-			c1.fill = GridBagConstraints.BOTH;
-			c1.anchor = GridBagConstraints.WEST;
+			setGridBagConstraints(c1, 5, 1, 1, 1, 0.2, 0, GridBagConstraints.BOTH, GridBagConstraints.WEST);
 			p1.add(t1_4, c1);
 			input[3] = t1_4;
 
@@ -187,14 +124,7 @@ public class GUI {
         JPanel p2 = new JPanel();
         p2.setLayout(new GridBagLayout());
 		p2.setBorder(new EmptyBorder(10,20,10,20));
-        c.gridx = 0;
-        c.gridy = 1;
-        c.gridwidth = 1;
-        c.gridheight = 1;
-        c.weightx = 0;
-        c.weighty = 0;
-        c.fill = GridBagConstraints.BOTH;
-        c.anchor = GridBagConstraints.CENTER;
+		setGridBagConstraints(c, 0, 1, 1, 1, 0, 0, GridBagConstraints.BOTH, GridBagConstraints.CENTER);
         f.add(p2, c);
 
 	        JButton b2_1 = new JButton("start");
@@ -217,27 +147,13 @@ public class GUI {
         JPanel p3 = new JPanel();
         p3.setLayout(new GridBagLayout());
 		p3.setBorder(new EmptyBorder(0,20,20,20));
-        c.gridx = 0;
-        c.gridy = 2;
-        c.gridwidth = 1;
-        c.gridheight = 1;
-        c.weightx = 1;
-        c.weighty = 1;
-        c.fill = GridBagConstraints.BOTH;
-        c.anchor = GridBagConstraints.WEST;
+		setGridBagConstraints(c, 0, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.WEST);
         f.add(p3, c);
 
 			GridBagConstraints c3 = new GridBagConstraints();
 			for(int i = 0; i < houseInfo.length; i++){
 				JLabel l3_1 = new JLabel(houseInfo[i]);
-				c3.gridx = 0;
-				c3.gridy = i;
-				c3.gridwidth = 1;
-				c3.gridheight = 1;
-				c3.weightx = 0.1;
-				c3.weighty = 1;
-				c3.fill = GridBagConstraints.NONE;
-				c3.anchor = GridBagConstraints.WEST;
+				setGridBagConstraints(c3, 0, i, 1, 1, 0.1, 1, GridBagConstraints.NONE, GridBagConstraints.WEST);
 				p3.add(l3_1, c3);
 			}
 			targetHouseInfo = new JTextField[houseInfo.length];
@@ -245,14 +161,7 @@ public class GUI {
 				JTextField t3_1 = new JTextField();
 				t3_1.setEditable(false);
 				targetHouseInfo[i] = t3_1;
-				c3.gridx = 1;
-				c3.gridy = i;
-				c3.gridwidth = 1;
-				c3.gridheight = 1;
-				c3.weightx = 0.4;
-				c3.weighty = 0;
-				c3.fill = GridBagConstraints.HORIZONTAL;
-				c3.anchor = GridBagConstraints.WEST;
+				setGridBagConstraints(c3, 1, i, 1, 1, 0.4, 0, GridBagConstraints.HORIZONTAL, GridBagConstraints.WEST);
 				p3.add(t3_1, c3);
 			}
 
@@ -261,15 +170,7 @@ public class GUI {
 			t3_2.setEditable(false);
 			JScrollPane s3_2 = new JScrollPane(t3_2);
 			s3_2.setBorder(new EmptyBorder(10,10,10,10));
-
-			c3.gridx = 2;
-			c3.gridy = 0;
-			c3.gridwidth = 1;
-			c3.gridheight = houseInfo.length;
-			c3.weightx = 1;
-			c3.weighty = 0.5;
-			c3.fill = GridBagConstraints.BOTH;
-			c3.anchor = GridBagConstraints.NORTHWEST;
+			setGridBagConstraints(c3, 2, 0, 1, houseInfo.length, 1, 0.5, GridBagConstraints.BOTH, GridBagConstraints.NORTHWEST);
 			p3.add(s3_2, c3);
 
 		/*
@@ -283,28 +184,14 @@ public class GUI {
 		JPanel p4 = new JPanel();
         p4.setLayout(new GridBagLayout());
 		p4.setBorder(new EmptyBorder(0,10,10,10));
-        c.gridx = 0;
-        c.gridy = 3;
-        c.gridwidth = 1;
-        c.gridheight = 1;
-        c.weightx = 1;
-        c.weighty = 0;
-        c.fill = GridBagConstraints.BOTH;
-        c.anchor = GridBagConstraints.WEST;
+		setGridBagConstraints(c, 0, 3, 1, 1, 1, 0, GridBagConstraints.BOTH, GridBagConstraints.WEST);
         f.add(p4, c);
 
 			GridBagConstraints c4 = new GridBagConstraints();
 
 	        JLabel l4_1 = new JLabel("Ready");
 			// l4_1.setBorder(BorderFactory.createLoweredBevelBorder());
-			c4.gridx = 0;
-			c4.gridy = 0;
-			c4.gridwidth = 1;
-			c4.gridheight = 1;
-			c4.weightx = 1;
-			c4.weighty = 1;
-			c4.fill = GridBagConstraints.BOTH;
-			c4.anchor = GridBagConstraints.WEST;
+	        setGridBagConstraints(c4, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.WEST);
 	        p4.add(l4_1, c4);
 	        status = l4_1;
 
@@ -313,6 +200,7 @@ public class GUI {
     public void addStartListener(ActionListener start){
         startButton.addActionListener(start);
     }
+    
     public void addCancelListener(ActionListener cancel){
 		cancelButton.addActionListener(cancel);
 	}
@@ -338,5 +226,16 @@ public class GUI {
 	}
 	public String getInputZip(){
 		return input[3].getText();
+	}
+	
+	public void setGridBagConstraints(GridBagConstraints c, int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty, int fill, int anchor){
+        c.gridx = gridx;
+        c.gridy = gridy;
+        c.gridwidth = gridwidth;
+        c.gridheight = gridheight;
+        c.weightx = weightx;
+        c.weighty = weighty;
+        c.fill = fill;
+        c.anchor = anchor;
 	}
 }

@@ -15,18 +15,18 @@ import predictor.model.data.House;
 
 public class ZillowParser {
 	
-    public static ArrayList<House> parseNearbyHouses(House h) throws Exception{
-        // 42.135515 - 42.106676 = 0.028839 -> +-0.0144
-        // -71.154907 - -71.193874 = 0.038967 -> +-0.0195
-        return parseArea(h.latitude, h.longitude, 0.015, 0.02);
-        // return this.parseNearbyHouses(h, 0.007, 0.01);
-    }
+//    public static ArrayList<House> parseNearbyHouses(House h) throws Exception{
+//        // 42.135515 - 42.106676 = 0.028839 -> +-0.0144
+//        // -71.154907 - -71.193874 = 0.038967 -> +-0.0195
+//        return parseArea(h.latitude, h.longitude, 0.015, 0.02);
+//        // return this.parseNearbyHouses(h, 0.007, 0.01);
+//    }
+	
     public static ArrayList<House> parseArea(Double latitude, Double longitude, Double latitudeRange, Double longitudeRange) throws Exception{
         // http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/globalrelevanceex_sort/42.130232,-71.153255,42.10139,-71.193381_rect/14_zm/2_p/
 
         ArrayList<House> houses = new ArrayList<House>();
-        DecimalFormat formatter = new DecimalFormat("#.######");
-        formatter.applyPattern("0.000000");
+        DecimalFormat formatter = new DecimalFormat("0.000000");
 
         String up = formatter.format(latitude + latitudeRange);
         String down = formatter.format(latitude);
@@ -53,7 +53,6 @@ public class ZillowParser {
                 wc.getOptions().setThrowExceptionOnScriptError(false);
                 wc.getOptions().setTimeout(10000);
                 HtmlPage page = wc.getPage(url);
-//	            JavaScriptJobManager manager = page.getEnclosingWindow().getJobManager();
 
                 int errorCount = 0;
                 while(true){
@@ -109,7 +108,7 @@ public class ZillowParser {
 	}
 	
 	public static House parseHouseDetailPage(String url) throws Exception{
-		System.err.println("Get house detail from: " + url);
+//		System.err.println("Get house detail from: " + url);
 		
 		House h = new House();
         Document doc;
