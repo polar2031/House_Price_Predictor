@@ -28,5 +28,6 @@
 	<classpathentry kind="lib" path="lib/htmlunit-2.26/lib/xercesImpl-2.11.0.jar"/>
 	<classpathentry kind="lib" path="lib/htmlunit-2.26/lib/xml-apis-1.4.01.jar"/>
 	<classpathentry kind="lib" path="lib/commons-math3-3.6.1/commons-math3-3.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/flanagan.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

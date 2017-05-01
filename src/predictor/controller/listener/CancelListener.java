@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 
 public class CancelListener implements ActionListener {
 	public Controller c;
-
 	
 	public CancelListener(Controller c){
 		super();

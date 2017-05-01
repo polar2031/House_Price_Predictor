@@ -2,7 +2,7 @@ package predictor.controller;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.List;
 
 import predictor.gui.GUI;
 import predictor.model.data.House;
@@ -32,7 +32,7 @@ public class Common {
         }
     }
 	
-    public static void showSampleList(ArrayList<House> houseList, GUI g){
+    public static void showSampleList(List<House> houseList, GUI g){
         for(int i = 0; i < houseList.size(); i++){
             g.sampleList.setText(g.sampleList.getText() + houseList.get(i).address + "\n");
         }

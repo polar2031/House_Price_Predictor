@@ -1,7 +1,5 @@
 package predictor.controller.task;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.SwingWorker;
@@ -9,6 +7,7 @@ import javax.swing.SwingWorker;
 import predictor.controller.Common;
 import predictor.gui.GUI;
 import predictor.model.Model;
+import predictor.model.Sampler;
 
 public class PredictionTask extends SwingWorker<Void, String> {
 	private Model m;
@@ -32,24 +31,21 @@ public class PredictionTask extends SwingWorker<Void, String> {
 			return null;
 		}
 		
-		ArrayList<String> dataList = m.getSampleDataList();
+		List<String> CoordinateList = Sampler.getSampleCoordinateList(m.target.latitude, m.target.longitude);
 		
-		
-        DecimalFormat formatter = new DecimalFormat("#");
-
-		for(int i = 0; !isCancelled() && i < dataList.size(); i++){
-			float persantage = ((float)(i + 1) / (float)dataList.size()) * 100;
-			publish("Get Sample Houses: " + formatter.format(persantage) + "%");
-			try{
-				m.getDataOfCoordinate(dataList.get(i));
+		for(int i = 0; !isCancelled() && i < CoordinateList.size(); i++){
+			int persentage = (i + 1) * 100 / CoordinateList.size();
+			publish("Get Sample Houses: " + persentage + "%");
+			
+			if(Sampler.isDataOfCoordinateUp2Date(CoordinateList.get(i))){
+				publish("Get Sample Houses: " + persentage + "%  Database Updating...");
+				Sampler.updateDataOfCoordinate(CoordinateList.get(i));
 			}
-			catch(Exception e){
-				e.printStackTrace();
-			}
+			m.addSamples(Sampler.getDataOfCoordinate(CoordinateList.get(i)));
 		}
+		
 		try{
 			publish("Predicting");
-			m.fixSample();
 			m.sampleFilter();
             m.predict();
 		}

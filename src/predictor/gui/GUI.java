@@ -32,7 +32,7 @@ public class GUI {
 							};
 
 	public GUI(){
-		//set program style as default style of OS
+		//set program style as default style of the OS
 		try{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}

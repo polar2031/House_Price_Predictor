@@ -1,5 +1,6 @@
 package predictor.model.parser;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class ZillowParser {
 //        // return this.parseNearbyHouses(h, 0.007, 0.01);
 //    }
 	
-    public static ArrayList<House> parseArea(Double latitude, Double longitude, Double latitudeRange, Double longitudeRange) throws Exception{
+    public static ArrayList<House> parseArea(Double latitude, Double longitude, Double latitudeRange, Double longitudeRange) {
         // http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/globalrelevanceex_sort/42.130232,-71.153255,42.10139,-71.193381_rect/14_zm/2_p/
 
         ArrayList<House> houses = new ArrayList<House>();
@@ -46,7 +47,6 @@ public class ZillowParser {
             Elements urlElements;
             
             try{
-
             	WebClient wc = new WebClient();
                 wc.getOptions().setJavaScriptEnabled(true);
                 wc.getOptions().setCssEnabled(false);
@@ -67,22 +67,23 @@ public class ZillowParser {
                 }
                 wc.close();
             }
-            catch(Exception e){
-            	throw new Exception("connection_error");
-            }
+            catch(IOException e){
+            	e.printStackTrace();
+            	return null;
+            } catch (InterruptedException e) {
+				e.printStackTrace();
+				return null;
+			}
             
-            try{
-                // get page number
-                if(i == 1){
-                    Elements pageSelectElements = udoc.select("ol[class=\"zsg-pagination\"]").select("li");
-                    if(!pageSelectElements.isEmpty() && pageSelectElements.size() > 1){
-                        parsePages = Integer.parseInt(pageSelectElements.get(pageSelectElements.size() - 2).text());
-                    }
+            
+            // get page number
+            if(i == 1){
+                Elements pageSelectElements = udoc.select("ol[class=\"zsg-pagination\"]").select("li");
+                if(!pageSelectElements.isEmpty() && pageSelectElements.size() > 1){
+                    parsePages = Integer.parseInt(pageSelectElements.get(pageSelectElements.size() - 2).text());
                 }
             }
-            catch(Exception e){
-            	throw new Exception("parse_error");
-            }
+
 
             for(Element u : urlElements){
                 String houseUrl = u.attr("abs:href");
