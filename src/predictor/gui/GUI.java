@@ -28,7 +28,7 @@ public class GUI {
 								"Built Year",
 								"Last Sold time",
 								"Last Sold Price",
-								"predict Price"
+								"Predict Price"
 							};
 
 	public GUI(){
