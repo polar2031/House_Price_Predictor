@@ -198,6 +198,7 @@ public class ZillowParser {
             //get lot size from feature
             h.lotSize = 0;
             for(String feature : h.features){
+            	System.err.println(feature);
                 if(feature.matches("Lot:(.*)acres")){
                     //1acre = 43560sqft
                     h.lotSize = Double.parseDouble(feature.replaceAll("[^\\.^\\-^\\d]", "")) * 43560;
@@ -206,6 +207,7 @@ public class ZillowParser {
                     h.lotSize = Double.parseDouble(feature.replaceAll("[^\\.^\\-^\\d]", ""));
                 }
                 else if (feature.matches("Built in (.*)")){
+                	
                     h.builtYear = Integer.parseInt(feature.replaceAll("[^\\.^\\-^\\d]", ""));
                 }
             }

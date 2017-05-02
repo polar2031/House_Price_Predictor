@@ -43,15 +43,11 @@ public class Sampler {
 	
 	public static boolean isDataOfCoordinateUp2Date(String coordinate) {
 		File areaData = new File("data" + File.separator + coordinate + ".dat");
-//		if(areaData.exists() && FileUtils.isFileNewer(areaData,; System.currentTimeMillis() - (25920000))){
-		System.err.println(areaData.lastModified());
-		System.err.println("System time: " + System.currentTimeMillis());
-		System.err.println(-areaData.lastModified() + System.currentTimeMillis() - (25920000));
-	    if(areaData.exists()){
+		if(areaData.exists() && FileUtils.isFileNewer(areaData, System.currentTimeMillis() - (25920000))){
 	    	return false;
 	    }
 	    else{
-	    	return true;
+	    	return false;
 	    }
 	}
 	public static boolean updateDataOfCoordinate(String coordinate) {

@@ -38,7 +38,7 @@ public class PredictionTask extends SwingWorker<Void, String> {
 			publish("Get Sample Houses: " + persentage + "%");
 			
 			if(Sampler.isDataOfCoordinateUp2Date(CoordinateList.get(i))){
-				publish("Get Sample Houses: " + persentage + "%  Database Updating...");
+				publish("Get Sample Houses: " + persentage + "%  Updating Data...");
 				Sampler.updateDataOfCoordinate(CoordinateList.get(i));
 			}
 			m.addSamples(Sampler.getDataOfCoordinate(CoordinateList.get(i)));
@@ -46,7 +46,7 @@ public class PredictionTask extends SwingWorker<Void, String> {
 		
 		try{
 			publish("Predicting");
-			m.sampleFilter();
+			m.sampleFilter(80);
             m.predict();
 		}
 		catch(Exception e){
