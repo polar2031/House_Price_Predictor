@@ -11,7 +11,7 @@ public class PreProcessor {
 	public static List<House> sampleFilter(List<House> sampleList, House target, int maxSampleNumber){
 
 		List<House> newSamples;
-		double minSimilarity = 0.0;
+		double minSimilarity = 0.7;
 		int filterSampleNumber = 0;
 		
         // remove bad samples
@@ -72,13 +72,13 @@ public class PreProcessor {
         	a[i][0] = 0;
             a[i][1] = sampleList.get(i).floorSize;
             a[i][2] = sampleList.get(i).lotSize;
-//            a[i][2] = 0;
+            a[i][2] = 0;
             a[i][3] = sampleList.get(i).bedroomNumber;
             a[i][3] = 0;
             a[i][4] = sampleList.get(i).bathroomNumber;
-//            a[i][4] = 0;
+            a[i][4] = 0;
             a[i][5] = (double)(sampleList.get(i).builtYear - thisYear);
-//            a[i][5] = 0;
+            a[i][5] = 0;
         }
         
         return a;
@@ -100,13 +100,13 @@ public class PreProcessor {
     	a[0][0] = 0;
         a[0][1] = target.floorSize;
         a[0][2] = target.lotSize;
-//        a[0][2] = 0;
+        a[0][2] = 0;
         a[0][3] = target.bedroomNumber;
         a[0][3] = 0;
         a[0][4] = target.bathroomNumber;
-//        a[0][4] = 0;
+        a[0][4] = 0;
         a[0][5] = (double)(target.builtYear - thisYear);
-//        a[0][5] = 0;
+        a[0][5] = 0;
 
 		return a;
 	}

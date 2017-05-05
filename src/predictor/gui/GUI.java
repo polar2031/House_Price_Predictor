@@ -108,7 +108,7 @@ public class GUI {
 			input[3] = t1_4;
 
 	        // set default text in input columns
-	        input[0].setText("2 ginger way");
+	        input[0].setText("9 ginger way");
 	        input[1].setText("Sharon");
 	        input[2].setText("ma");
 	        input[3].setText("02067");

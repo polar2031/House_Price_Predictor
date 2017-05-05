@@ -187,6 +187,15 @@ public class ZillowParser {
         	//do nothing
         }
         
+        Elements featureElements = doc.select("div[class=\"hdp-facts-expandable-container clear\"]")
+        							.select("div[class=\"zsg-g zsg-g_gutterless\"]")
+        							.select("div[class=\"zsg-lg-1-3 zsg-md-1-2\"]");
+        
+        h.builtYear = Integer.parseInt(featureElements.get(1).select("div[class=\"hdp-fact-ataglance-value\"]").text());
+        
+        
+        							
+        /*
         try{
             //get features and features
             Elements featureElements = doc.select("ul[class=\"zsg-list_square zsg-lg-1-3 zsg-md-1-2 zsg-sm-1-1\"]")
@@ -215,7 +224,7 @@ public class ZillowParser {
         catch(Exception e){
         	//do nothing
         }
-        
+        */
 		return h;
 	}
 }
