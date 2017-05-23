@@ -15,7 +15,8 @@ public class CancelListener implements ActionListener {
 	
 	@Override
     public void actionPerformed(ActionEvent event) {
+		c.g.cancelButton.setEnabled(false);
+		c.g.setStatusText("Cancelling...");
 		c.task.cancel(true);
-		c.g.showInputCard();
     }
 }

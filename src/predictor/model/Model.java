@@ -112,7 +112,14 @@ public class Model {
         
         for(int i = 0; i < sampleList.size(); i++){
         	
-			System.out.println(sampleList.get(i).floorSize + "," + sampleList.get(i).lastSoldPrice + "," + l.solve(PreProcessor.targetVariableTransform(sampleList.get(i)), bestLamda));
+			System.out.println(sampleList.get(i).address + "," + 
+								sampleList.get(i).floorSize + "," + 
+								sampleList.get(i).lotSize + "," +
+								sampleList.get(i).bedroomNumber + "," +
+								sampleList.get(i).bathroomNumber + "," +
+								(2017 - sampleList.get(i).builtYear) + "," +
+								sampleList.get(i).lastSoldPrice + "," + 
+								l.solve(PreProcessor.targetVariableTransform(sampleList.get(i)), bestLamda));
 		}
     }
 

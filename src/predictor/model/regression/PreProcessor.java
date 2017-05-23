@@ -21,7 +21,7 @@ public class PreProcessor {
         }
 
 		List<House> newSamples = new ArrayList<House>();
-		double minSimilarity = 0.5;
+		double minSimilarity = 0.8;
 		int filterSampleNumber = 0;
 
         if(sampleList.size() < maxSampleNumber * 4){
@@ -73,7 +73,7 @@ public class PreProcessor {
         	a[i][0] = 0;
             a[i][1] = sampleList.get(i).floorSize;
             a[i][2] = sampleList.get(i).lotSize;
-//            a[i][2] = 0;
+            a[i][2] = 0;
             a[i][3] = sampleList.get(i).bedroomNumber;
             a[i][3] = 0;
             a[i][4] = sampleList.get(i).bathroomNumber;
@@ -101,7 +101,7 @@ public class PreProcessor {
     	a[0][0] = 0;
         a[0][1] = target.floorSize;
         a[0][2] = target.lotSize;
-//        a[0][2] = 0;
+        a[0][2] = 0;
         a[0][3] = target.bedroomNumber;
         a[0][3] = 0;
         a[0][4] = target.bathroomNumber;
