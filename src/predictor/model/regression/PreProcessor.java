@@ -10,17 +10,20 @@ public class PreProcessor {
 	
 	public static List<House> sampleFilter(List<House> sampleList, House target, int maxSampleNumber){
 
-		List<House> newSamples;
-		double minSimilarity = 0.7;
-		int filterSampleNumber = 0;
-		
         // remove bad samples
-        for(int i = 0; i < sampleList.size(); i++){
+        for(int i = 0; i < sampleList.size(); ){
             if(sampleList.get(i).lastSoldPrice == null){
             	sampleList.remove(i);
             }
+            else{
+            	i++;
+            }
         }
-        
+
+		List<House> newSamples = new ArrayList<House>();
+		double minSimilarity = 0.5;
+		int filterSampleNumber = 0;
+
         if(sampleList.size() < maxSampleNumber * 4){
         	filterSampleNumber = sampleList.size();
         }
@@ -35,7 +38,6 @@ public class PreProcessor {
         }
         
         // take top 4n similar sample
-        newSamples = new ArrayList<House>();
         for(int i = 0; i < filterSampleNumber; i++){
             double tempS = 0;
             int index = 0;
@@ -52,7 +54,6 @@ public class PreProcessor {
         
         
         for(int i = 0; i < sampleList.size(); ){
-        	System.err.println(sampleList.get(i).similarity);
             if(sampleList.get(i).similarity < minSimilarity){
             	sampleList.remove(i);
             	continue;
@@ -72,13 +73,13 @@ public class PreProcessor {
         	a[i][0] = 0;
             a[i][1] = sampleList.get(i).floorSize;
             a[i][2] = sampleList.get(i).lotSize;
-            a[i][2] = 0;
+//            a[i][2] = 0;
             a[i][3] = sampleList.get(i).bedroomNumber;
             a[i][3] = 0;
             a[i][4] = sampleList.get(i).bathroomNumber;
             a[i][4] = 0;
             a[i][5] = (double)(sampleList.get(i).builtYear - thisYear);
-            a[i][5] = 0;
+//            a[i][5] = 0;
         }
         
         return a;
@@ -100,13 +101,13 @@ public class PreProcessor {
     	a[0][0] = 0;
         a[0][1] = target.floorSize;
         a[0][2] = target.lotSize;
-        a[0][2] = 0;
+//        a[0][2] = 0;
         a[0][3] = target.bedroomNumber;
         a[0][3] = 0;
         a[0][4] = target.bathroomNumber;
         a[0][4] = 0;
         a[0][5] = (double)(target.builtYear - thisYear);
-        a[0][5] = 0;
+//        a[0][5] = 0;
 
 		return a;
 	}

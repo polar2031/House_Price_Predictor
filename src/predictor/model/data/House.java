@@ -33,7 +33,11 @@ public class House implements Serializable{
     public double similarity;
 
     // non standard features
-    public String features[];
+
+	public String houseType;
+	public String heating;
+	public String cooling;
+	public String parking;
 
     public House(){
     }

@@ -13,24 +13,21 @@ public class Model {
 	public List<House> sampleList;
 	public List<Double> data;
 	
-    public boolean setTarget(String address, String city, String state, String zip){
+    public void setTarget(String address, String city, String state, String zip) throws Exception {
     	target = null;
-    	sampleList = new ArrayList<House>();
-    	try{
-	    	House h = ZillowParser.parseHouseThrowAddress(address, state, zip);
-	    	if(h != null){
-	    		target = h;
-	    		return true;
-	    	}
+    	House h = ZillowParser.parseHouseThrowAddress(address, state, zip);
+    	if(h != null){
+    		target = h;
+    		return;
     	}
-    	catch(Exception e){
-    		e.printStackTrace();
-    	}
-    	return false;
-    	
+    	return;
     }
+
     
    public boolean addSamples(List<House> newSampleList) {
+	   if(sampleList == null){
+		   sampleList = new ArrayList<House>();
+	   }
 	   if(newSampleList == null){
 		   return false;
 	   }
@@ -38,6 +35,9 @@ public class Model {
 		   boolean repeat = false;
 		   for(int i = 0; i < newSampleList.size();){
 			   //exclude target house
+			   if(newSampleList.get(i) == null){
+				   newSampleList.remove(i);
+			   }
 			   if(newSampleList.get(i).address.compareTo(target.address) == 0){
 	        		newSampleList.remove(i);
 	        		continue;
@@ -81,14 +81,16 @@ public class Model {
     	double minRss = Double.MAX_VALUE;
     	test = PreProcessor.targetVariableTransform(target);
     	
+    	
+    	//find best lamda
     	do{
 	    	a = PreProcessor.sampleVariableTransform(sampleList);
 	    	b = PreProcessor.sampleSolutionTransform(sampleList, lamda);
 	    	LeastSquare lTemp = new LeastSquare(a, b);
 	    	double rss = lTemp.rss(a, b, lamda);
-	    	System.err.println("lamda: " + lamda);
-	    	System.err.println("rss: " + rss);
-	    	System.err.println("predict: " + lTemp.solve(test, lamda));
+//	    	System.err.println("lamda: " + lamda);
+//	    	System.err.println("rss: " + rss);  
+//	    	System.err.println("predict: " + lTemp.solve(test, lamda));
 	    	
 	    	if(rss < minRss){
 	    		bestLamda = lamda;
@@ -108,6 +110,17 @@ public class Model {
         target.predictPrice = l.solve(test, bestLamda);
         l.showSolution();
         
-        
+        for(int i = 0; i < sampleList.size(); i++){
+        	
+			System.out.println(sampleList.get(i).floorSize + "," + sampleList.get(i).lastSoldPrice + "," + l.solve(PreProcessor.targetVariableTransform(sampleList.get(i)), bestLamda));
+		}
     }
+
+	public boolean isTargetSet() {
+		if(target != null){
+			return true;
+		}
+		return false;
+	}
+
 }

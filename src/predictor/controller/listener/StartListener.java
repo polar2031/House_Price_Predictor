@@ -17,10 +17,12 @@ public class StartListener implements ActionListener {
 	@Override
     public void actionPerformed(ActionEvent event) {
         c.g.startButton.setEnabled(false);
-        c.g.clean();
+        
+        c.g.showProcessingCard();
+//        c.g.clean();
         c.task = new PredictionTask(c.m, c.g);
         c.task.execute();
-        c.g.cancelButton.setEnabled(true);
+//        c.g.cancelButton.setEnabled(true);
     }
 
 }

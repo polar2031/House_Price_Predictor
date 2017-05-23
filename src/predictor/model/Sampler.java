@@ -3,7 +3,6 @@ package predictor.model;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -16,8 +15,7 @@ import predictor.model.data.House;
 import predictor.model.parser.ZillowParser;
 
 public class Sampler {
-	public static List<String> getSampleCoordinateList(Double latitude, Double longitude) {
-		double range = 1;
+	public static List<String> getSampleCoordinateList(double latitude, double longitude, double range) {
 		
 		double EARTH_RADIUS = 3963.1906;
         double milesPerlatitude = EARTH_RADIUS * Math.PI / 180.0;
@@ -43,8 +41,9 @@ public class Sampler {
 	
 	public static boolean isDataOfCoordinateUp2Date(String coordinate) {
 		File areaData = new File("data" + File.separator + coordinate + ".dat");
-		if(areaData.exists() && FileUtils.isFileNewer(areaData, System.currentTimeMillis() - (25920000))){
-	    	return false;
+		// 30 days in milliseconds = 2592000000
+		if(areaData.exists() && (areaData.lastModified() > (System.currentTimeMillis() - (2592000000L)))){
+	    	return true;
 	    }
 	    else{
 	    	return false;
@@ -65,7 +64,7 @@ public class Sampler {
 			oos.close();
 			return true;
 		}
-		catch(IOException e){
+		catch(Exception e){
 			return false;
 		}
 		
