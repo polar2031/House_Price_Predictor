@@ -24,11 +24,22 @@ public class LeastSquare {
 		}
 	}
 	
-	public double solve(double[][] test, double lamda){
+	public double solve(double[][] test){
         RealMatrix tMatrix = new Array2DRowRealMatrix(test);
         RealMatrix p = tMatrix.multiply(solution);
-        double yLamda = p.getEntry(0, 0);
-        return Math.pow(yLamda, 1.0 / lamda);
+        return p.getEntry(0, 0);
+//        double yLamda = p.getEntry(0, 0);
+//        return Math.pow(yLamda, 1.0 / lamda);
+	}
+	
+	public double[] solveAll(double[][] test){
+		double[] result = new double[test.length];
+        RealMatrix tMatrix = new Array2DRowRealMatrix(test);
+        RealMatrix p = tMatrix.multiply(solution);
+        for(int i = 0; i < test.length; i++){
+        	result[i] = p.getEntry(i, 0);
+        }
+        return result;
 	}
 	
 	public double rss(double[][] a, double[] b, double lamda){

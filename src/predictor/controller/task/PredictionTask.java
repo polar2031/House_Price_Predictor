@@ -22,6 +22,7 @@ public class PredictionTask extends SwingWorker<Void, MessagePack> {
 	
 	@Override
 	protected Void doInBackground() throws Exception{
+		workDone = false;
 		int progress = 0;
 		//
 		publish(new MessagePack(progress, "Get Information of Target House"));
@@ -41,8 +42,11 @@ public class PredictionTask extends SwingWorker<Void, MessagePack> {
 		}
 		
 		progress = 30;
-		List<String> CoordinateList = Sampler.getSampleCoordinateList(m.target.latitude, m.target.longitude, 1.0);
-
+		
+		//sample range (in miles)
+		double range = 1.0;
+		List<String> CoordinateList = Sampler.getSampleCoordinateList(m.target.latitude, m.target.longitude, range);
+		
 		for(int i = 0; !isCancelled() && i < CoordinateList.size(); i++){
 			int persentage = i * 100 / CoordinateList.size();
 			progress = 30 + 30 * persentage / 100;
@@ -54,7 +58,7 @@ public class PredictionTask extends SwingWorker<Void, MessagePack> {
 					Sampler.updateDataOfCoordinate(CoordinateList.get(i));
 				}
 				catch(Exception e){
-					
+					e.printStackTrace();
 				}
 				if(isCancelled()){
 					return null;
@@ -71,7 +75,7 @@ public class PredictionTask extends SwingWorker<Void, MessagePack> {
 		progress = 60;
 		publish(new MessagePack(progress, "Predicting"));
 		try{
-			m.sampleFilter(80);
+			m.sampleFilter(200);
             m.predict();
 		}
 		catch(Exception e){
@@ -85,13 +89,21 @@ public class PredictionTask extends SwingWorker<Void, MessagePack> {
 	
 	@Override
     protected void done(){
-    	if(!isCancelled() && workDone == true){
+		// task is done normally
+    	if(workDone == true){
     		g.showResultCard();
     		Common.showHouseInfo(m.target, g);
             Common.showSampleList(m.sampleList, g);
             g.cancelButton.setEnabled(false);
             g.startButton.setEnabled(true);
     	}
+    	// task is cancelled
+    	else if(isCancelled()){
+            g.cancelButton.setEnabled(false);
+            g.startButton.setEnabled(true);
+            g.showInputCard();
+    	}
+    	// error occured
     	else{
             g.cancelButton.setEnabled(false);
             g.startButton.setEnabled(true);
