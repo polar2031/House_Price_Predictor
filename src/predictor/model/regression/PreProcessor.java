@@ -66,22 +66,22 @@ public class PreProcessor {
         }
 		return newSampleList;
 	}
-	
-	public static double[] variableTransform(House target) {
-		int thisYear = 2017;
-        double[] a = new double[variableNumber];
-    	a[0] = 0;
-        a[1] = target.floorSize;
-        a[2] = target.lotSize;
-        a[3] = target.bedroomNumber;
-        a[3] = 0;
-        a[4] = target.bathroomNumber;
-        a[4] = 0;
-        a[5] = (double)(- thisYear + target.builtYear);
-//        a[5] = 0;
-
-		return a;
-	}
+//	
+//	public static double[] variableTransform(House target) {
+//		int thisYear = 2017;
+//        double[] a = new double[variableNumber];
+//    	a[0] = 0;
+//        a[1] = target.floorSize;
+//        a[2] = target.lotSize;
+//        a[3] = target.bedroomNumber;
+//        a[3] = 0;
+//        a[4] = target.bathroomNumber;
+//        a[4] = 0;
+//        a[5] = (double)(- thisYear + target.builtYear);
+////        a[5] = 0;
+//
+//		return a;
+//	}
 	
 
 }

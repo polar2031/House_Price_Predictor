@@ -6,22 +6,22 @@ import javax.swing.SwingWorker;
 
 import predictor.controller.Common;
 import predictor.gui.mainGui;
-import predictor.model.Model;
+import predictor.model.PredictionModel;
 import predictor.model.Sampler;
 
 public class PredictionTask extends SwingWorker<Void, MessagePack> {
-	private Model m;
+	private PredictionModel m;
 	private mainGui g;
 	boolean workDone;
 	
-	public PredictionTask(Model m, mainGui g){
+	public PredictionTask(mainGui g){
 		super();
-		this.m = m;
 		this.g = g;
 	}
 	
 	@Override
 	protected Void doInBackground() throws Exception{
+		m = new PredictionModel();
 		workDone = false;
 		int progress = 0;
 		//
@@ -74,8 +74,10 @@ public class PredictionTask extends SwingWorker<Void, MessagePack> {
 		
 		progress = 60;
 		publish(new MessagePack(progress, "Predicting"));
+		
 		try{
 			m.sampleFilter(200);
+			m.setVariable(g.getVariableOptions());
             m.predict();
 		}
 		catch(Exception e){
@@ -121,12 +123,3 @@ public class PredictionTask extends SwingWorker<Void, MessagePack> {
 	}
 }
 
-class MessagePack{
-	int progress;
-	String message;
-	
-	public MessagePack(int i, String s){
-		progress = i;
-		message = s;
-	}
-}

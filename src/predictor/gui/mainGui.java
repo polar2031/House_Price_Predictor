@@ -28,6 +28,8 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JProgressBar;
 import javax.swing.border.TitledBorder;
+import javax.swing.JCheckBox;
+import javax.swing.JTabbedPane;
 
 public class mainGui {
 
@@ -41,8 +43,10 @@ public class mainGui {
 	private JTextField textField_6;
 	
 	public JButton startButton;
+	public JButton startTestButton;
 	public JButton cancelButton;
 	public JButton restartButton;
+	public JButton restartTestButton;
 	private JLabel status;
 	private JProgressBar processingProgressBar;
 	private CardLayout card;
@@ -51,6 +55,18 @@ public class mainGui {
 	private JTextField textField_9;
 	private JTextField textField_10;
 	private JTextField textField_11;
+	private JCheckBox chckbxFloorSize;
+	private JCheckBox chckbxLotSize;
+	private JCheckBox chckbxBedroom;
+	private JCheckBox chckbxBathroom;
+	private JCheckBox chckbxAge;
+	private JCheckBox chckbxRegressionContainBase;
+	private JCheckBox checkBox;
+	private JCheckBox checkBox_1;
+	private JCheckBox checkBox_2;
+	private JCheckBox checkBox_3;
+	private JCheckBox checkBox_4;
+	private JCheckBox checkBox_5;
 	
 	
 	/**
@@ -101,14 +117,17 @@ public class mainGui {
 		card = new CardLayout(0, 0);
 		frame.getContentPane().setLayout(card);
 		
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		frame.getContentPane().add(tabbedPane, "input");
+		
 		JPanel panel = new JPanel();
+		tabbedPane.addTab("Normal Mode", null, panel, null);
 		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-		frame.getContentPane().add(panel, "input");
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{0, 0, 0, 80, 0, 70, 0};
-		gbl_panel.rowHeights = new int[]{100, 0, 0, 100, 0};
+		gbl_panel.rowHeights = new int[]{100, 0, 0, 0, 0, 0, 100, 0};
 		gbl_panel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
 		JLabel lblNewLabel = new JLabel("Enter Address");
@@ -191,13 +210,128 @@ public class mainGui {
 		textField_3.setColumns(10);
 		textField_3.setText("02067");
 		
+		chckbxFloorSize = new JCheckBox("Floor Size");
+		chckbxFloorSize.setEnabled(false);
+		chckbxFloorSize.setSelected(true);
+		GridBagConstraints gbc_chckbxFloorSize = new GridBagConstraints();
+		gbc_chckbxFloorSize.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxFloorSize.gridx = 0;
+		gbc_chckbxFloorSize.gridy = 4;
+		panel.add(chckbxFloorSize, gbc_chckbxFloorSize);
+		
+		chckbxLotSize = new JCheckBox("Lot Size");
+		chckbxLotSize.setEnabled(false);
+		chckbxLotSize.setSelected(true);
+		GridBagConstraints gbc_chckbxLotSize = new GridBagConstraints();
+		gbc_chckbxLotSize.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxLotSize.gridx = 1;
+		gbc_chckbxLotSize.gridy = 4;
+		panel.add(chckbxLotSize, gbc_chckbxLotSize);
+		
+		chckbxBedroom = new JCheckBox("Bedroom");
+		GridBagConstraints gbc_chckbxBedroom = new GridBagConstraints();
+		gbc_chckbxBedroom.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxBedroom.gridx = 2;
+		gbc_chckbxBedroom.gridy = 4;
+		panel.add(chckbxBedroom, gbc_chckbxBedroom);
+		
+		chckbxBathroom = new JCheckBox("Bathroom");
+		GridBagConstraints gbc_chckbxBathroom = new GridBagConstraints();
+		gbc_chckbxBathroom.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxBathroom.gridx = 3;
+		gbc_chckbxBathroom.gridy = 4;
+		panel.add(chckbxBathroom, gbc_chckbxBathroom);
+		
+		chckbxAge = new JCheckBox("Age");
+		GridBagConstraints gbc_chckbxAge = new GridBagConstraints();
+		gbc_chckbxAge.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxAge.gridx = 4;
+		gbc_chckbxAge.gridy = 4;
+		panel.add(chckbxAge, gbc_chckbxAge);
+		
+		chckbxRegressionContainBase = new JCheckBox("Regression Contain Base Price");
+		GridBagConstraints gbc_chckbxRegressionContainBase = new GridBagConstraints();
+		gbc_chckbxRegressionContainBase.gridwidth = 2;
+		gbc_chckbxRegressionContainBase.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxRegressionContainBase.gridx = 0;
+		gbc_chckbxRegressionContainBase.gridy = 5;
+		panel.add(chckbxRegressionContainBase, gbc_chckbxRegressionContainBase);
+		
 		JButton btnNewButton = new JButton("Start");
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.gridwidth = 6;
 		gbc_btnNewButton.gridx = 0;
-		gbc_btnNewButton.gridy = 3;
+		gbc_btnNewButton.gridy = 6;
 		panel.add(btnNewButton, gbc_btnNewButton);
 		startButton = btnNewButton;
+		
+		textField.setText("9 ginger way");
+		textField_1.setText("Sharon");
+		
+		JPanel panel_6 = new JPanel();
+		panel_6.setBorder(new EmptyBorder(10, 10, 10, 10));
+		tabbedPane.addTab("Test Mode", null, panel_6, null);
+		GridBagLayout gbl_panel_6 = new GridBagLayout();
+		gbl_panel_6.columnWidths = new int[]{0, 0, 0, 80, 0, 70, 0};
+		gbl_panel_6.rowHeights = new int[]{100, 0, 0, 0, 0, 0, 100, 0};
+		gbl_panel_6.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_6.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		panel_6.setLayout(gbl_panel_6);
+		
+		checkBox = new JCheckBox("Floor Size");
+		checkBox.setSelected(true);
+		checkBox.setEnabled(false);
+		GridBagConstraints gbc_checkBox = new GridBagConstraints();
+		gbc_checkBox.insets = new Insets(0, 0, 5, 5);
+		gbc_checkBox.gridx = 0;
+		gbc_checkBox.gridy = 4;
+		panel_6.add(checkBox, gbc_checkBox);
+		
+		checkBox_1 = new JCheckBox("Lot Size");
+		checkBox_1.setSelected(true);
+		checkBox_1.setEnabled(false);
+		GridBagConstraints gbc_checkBox_1 = new GridBagConstraints();
+		gbc_checkBox_1.insets = new Insets(0, 0, 5, 5);
+		gbc_checkBox_1.gridx = 1;
+		gbc_checkBox_1.gridy = 4;
+		panel_6.add(checkBox_1, gbc_checkBox_1);
+		
+		checkBox_2 = new JCheckBox("Bedroom");
+		GridBagConstraints gbc_checkBox_2 = new GridBagConstraints();
+		gbc_checkBox_2.insets = new Insets(0, 0, 5, 5);
+		gbc_checkBox_2.gridx = 2;
+		gbc_checkBox_2.gridy = 4;
+		panel_6.add(checkBox_2, gbc_checkBox_2);
+		
+		checkBox_3 = new JCheckBox("Bathroom");
+		GridBagConstraints gbc_checkBox_3 = new GridBagConstraints();
+		gbc_checkBox_3.insets = new Insets(0, 0, 5, 5);
+		gbc_checkBox_3.gridx = 3;
+		gbc_checkBox_3.gridy = 4;
+		panel_6.add(checkBox_3, gbc_checkBox_3);
+		
+		checkBox_4 = new JCheckBox("Age");
+		GridBagConstraints gbc_checkBox_4 = new GridBagConstraints();
+		gbc_checkBox_4.insets = new Insets(0, 0, 5, 5);
+		gbc_checkBox_4.gridx = 4;
+		gbc_checkBox_4.gridy = 4;
+		panel_6.add(checkBox_4, gbc_checkBox_4);
+		
+		checkBox_5 = new JCheckBox("Regression Contain Base Price");
+		GridBagConstraints gbc_checkBox_5 = new GridBagConstraints();
+		gbc_checkBox_5.gridwidth = 2;
+		gbc_checkBox_5.insets = new Insets(0, 0, 5, 5);
+		gbc_checkBox_5.gridx = 0;
+		gbc_checkBox_5.gridy = 5;
+		panel_6.add(checkBox_5, gbc_checkBox_5);
+		
+		JButton button = new JButton("Start");
+		startTestButton = button;
+		GridBagConstraints gbc_button = new GridBagConstraints();
+		gbc_button.gridwidth = 6;
+		gbc_button.gridx = 0;
+		gbc_button.gridy = 6;
+		panel_6.add(button, gbc_button);
 		
 		JPanel panel_1 = new JPanel();
 		frame.getContentPane().add(panel_1, "processing");
@@ -252,9 +386,6 @@ public class mainGui {
 		gbc_btnNewButton_1.gridx = 0;
 		gbc_btnNewButton_1.gridy = 3;
 		panel_1.add(btnNewButton_1, gbc_btnNewButton_1);
-		
-		textField.setText("9 ginger way");
-		textField_1.setText("Sharon");
 		
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(null);
@@ -441,9 +572,24 @@ public class mainGui {
 		panel_4.add(btnNewButton_2);
 		restartButton = btnNewButton_2;
 		
+		JPanel panel_7 = new JPanel();
+		frame.getContentPane().add(panel_7, "testResult");
+		panel_7.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panel_8 = new JPanel();
+		panel_7.add(panel_8, BorderLayout.SOUTH);
+		
+		JButton button_1 = new JButton("Start a New Prediction");
+		restartTestButton = button_1;
+		panel_8.add(button_1);
+		
 	}
     public void addStartListener(ActionListener start){
     	startButton.addActionListener(start);
+    }
+    
+    public void addStartTestListener(ActionListener start){
+    	startTestButton.addActionListener(start);
     }
     
     public void addCancelListener(ActionListener cancel){
@@ -452,6 +598,10 @@ public class mainGui {
     
     public void addRestartListener(ActionListener restart){
 		restartButton.addActionListener(restart);
+	}
+    
+    public void addRestartTestListener(ActionListener restartTest){
+		restartTestButton.addActionListener(restartTest);
 	}
     
     
@@ -518,5 +668,63 @@ public class mainGui {
 	public void showResultCard(){
 		card.show(frame.getContentPane(), "result");
 	}
-	
+	public void showTestResultCard(){
+		card.show(frame.getContentPane(), "testResult");
+	}
+	public boolean[] getVariableOptions() {
+		boolean[] o = new boolean[6];
+		o[0] = chckbxFloorSize.isSelected();
+		o[1] = chckbxLotSize.isSelected();
+		o[2] = chckbxRegressionContainBase.isSelected();
+		o[3] = chckbxBedroom.isSelected();
+		o[4] = chckbxBathroom.isSelected();
+		o[5] = chckbxAge.isSelected();
+		return o;
+	}
+	public boolean[] getTestVariableOptions() {
+		boolean[] o = new boolean[6];
+		o[0] = checkBox.isSelected();
+		o[1] = checkBox_1.isSelected();
+		o[2] = checkBox_5.isSelected();
+		o[3] = checkBox_2.isSelected();
+		o[4] = checkBox_3.isSelected();
+		o[5] = checkBox_4.isSelected();
+		return o;
+	}
+	public JCheckBox getChckbxFloorSize() {
+		return chckbxFloorSize;
+	}
+	public JCheckBox getChckbxLotSize() {
+		return chckbxLotSize;
+	}
+	public JCheckBox getChckbxBedroom() {
+		return chckbxBedroom;
+	}
+	public JCheckBox getChckbxBathroom() {
+		return chckbxBathroom;
+	}
+	public JCheckBox getChckbxAge() {
+		return chckbxAge;
+	}
+	public JCheckBox getChckbxRegressionContainBase() {
+		return chckbxRegressionContainBase;
+	}
+	public JCheckBox getCheckBox() {
+		return checkBox;
+	}
+	public JCheckBox getCheckBox_1() {
+		return checkBox_1;
+	}
+	public JCheckBox getCheckBox_2() {
+		return checkBox_2;
+	}
+	public JCheckBox getCheckBox_3() {
+		return checkBox_3;
+	}
+	public JCheckBox getCheckBox_4() {
+		return checkBox_4;
+	}
+	public JCheckBox getCheckBox_5() {
+		return checkBox_5;
+	}
 }

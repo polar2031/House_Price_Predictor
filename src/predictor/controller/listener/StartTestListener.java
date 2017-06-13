@@ -1,24 +1,24 @@
 package predictor.controller.listener;
 
 import predictor.controller.Controller;
-import predictor.controller.task.PredictionTask;
+import predictor.controller.task.ListPredictionTask;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class StartListener implements ActionListener {
+public class StartTestListener implements ActionListener {
 	public Controller c;
 	
-	public StartListener(Controller c){
+	public StartTestListener(Controller c){
 		super();
 		this.c = c;
 	}
 	
 	@Override
     public void actionPerformed(ActionEvent event) {
-        c.g.startButton.setEnabled(false);
+        c.g.startTestButton.setEnabled(false);
         c.g.showProcessingCard();
-        c.task = new PredictionTask(c.g);
+        c.task = new ListPredictionTask(c.g);
         c.task.execute();
         c.g.cancelButton.setEnabled(true);
     }
