@@ -1,7 +1,7 @@
 package predictor.model.regression;
 
 public class BoxCoxTransform {
-	public static double[] transform(double[] a, double lamda){
+	public static double[] transformAll(double[] a, double lamda){
 		double[] b = new double[a.length];
 		b = a.clone();
 		for(int i = 0; i < a.length; i++){

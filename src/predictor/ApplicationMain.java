@@ -1,6 +1,6 @@
 package predictor;
 
-import predictor.gui.mainGui;
+import predictor.gui.MainGui;
 import predictor.controller.Controller;
 
 public class ApplicationMain {
@@ -12,7 +12,7 @@ public class ApplicationMain {
 			java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(java.util.logging.Level.SEVERE); 
 			System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
 			
-			mainGui g = new mainGui();
+			MainGui g = new MainGui();
 	        Controller c = new Controller(g);
 	        c.start();
 		}

@@ -3,72 +3,73 @@ package predictor.gui;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import java.awt.GridBagLayout;
-import javax.swing.JLabel;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JTextField;
-import java.awt.GridLayout;
-import javax.swing.JLayeredPane;
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
-
-import javax.swing.JTextPane;
-import javax.swing.Timer;
-import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JProgressBar;
-import javax.swing.border.TitledBorder;
-import javax.swing.JCheckBox;
 import javax.swing.JTabbedPane;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.event.ActionListener;
 
-public class mainGui {
+import javax.swing.border.EmptyBorder;
+import java.awt.FlowLayout;
+import javax.swing.BoxLayout;
+import java.awt.Dimension;
+import javax.swing.JList;
+import javax.swing.JComboBox;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.JButton;
+import java.awt.Component;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.JCheckBox;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import java.awt.event.ActionEvent;
+import javax.swing.JProgressBar;
+
+public class MainGui {
 
 	public JFrame frame;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
-	private JTextField textField_5;
-	private JTextField textField_6;
+	private JTabbedPane tabbedPaneInput;
+	private CardLayout mainCard;
 	
-	public JButton startButton;
-	public JButton startTestButton;
-	public JButton cancelButton;
-	public JButton restartButton;
-	public JButton restartTestButton;
-	private JLabel status;
-	private JProgressBar processingProgressBar;
-	private CardLayout card;
-	private JTextField textField_7;
-	private JTextField textField_8;
-	private JTextField textField_9;
-	private JTextField textField_10;
-	private JTextField textField_11;
+	private JTextField txtAddress;
+	private JTextField txtCitytown;
+	private JTextField txtState;
+	private JTextField txtZip;
+	private JTextField txtZip_1;
+	
+	private JButton btnStart;
+	private JButton btnCancel;
+	private JButton btnRestart;
+	private JButton btnRestart_1;
+	private JCheckBox chckbxPrice;
 	private JCheckBox chckbxFloorSize;
 	private JCheckBox chckbxLotSize;
-	private JCheckBox chckbxBedroom;
-	private JCheckBox chckbxBathroom;
-	private JCheckBox chckbxAge;
-	private JCheckBox chckbxRegressionContainBase;
-	private JCheckBox checkBox;
-	private JCheckBox checkBox_1;
-	private JCheckBox checkBox_2;
-	private JCheckBox checkBox_3;
-	private JCheckBox checkBox_4;
-	private JCheckBox checkBox_5;
-	
-	
+	private JCheckBox chckbxBedroomNumber;
+	private JCheckBox chckbxBathroomNumber;
+	private JCheckBox chckbxHouseAge;
+	private JCheckBox chckbxTransferPrice;
+	private JCheckBox chckbxTransferFloorSize;
+	private JCheckBox chckbxTransferLotSize;
+	private JCheckBox chckbxUseBasePrice;
+	private JProgressBar processingProgressBar;
+	private JLabel processingStatus;
+	private JSpinner sampleNumberSpinner;
+	private JComboBox<String> comboBoxMethod;
+
 	/**
 	 * Launch the application.
 	 */
@@ -76,7 +77,7 @@ public class mainGui {
 //		EventQueue.invokeLater(new Runnable() {
 //			public void run() {
 //				try {
-//					mainGui window = new mainGui();
+//					MainGui window = new MainGui();
 //					window.frame.setVisible(true);
 //				} catch (Exception e) {
 //					e.printStackTrace();
@@ -88,7 +89,7 @@ public class mainGui {
 	/**
 	 * Create the application.
 	 */
-	public mainGui() {
+	public MainGui() {
 		initialize();
 	}
 
@@ -96,600 +97,496 @@ public class mainGui {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		//set program style as default style of the OS
+		
 		try{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}
 		catch(Exception e){}
 		
-		frame = new JFrame("House Price Predictor");
-		frame.setBounds(100, 100, 550, 400);
+		frame = new JFrame();
+		frame.setBounds(100, 100, 500, 550);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
 		
-		JMenu mnNewMenu = new JMenu("About");
-		menuBar.add(mnNewMenu);
+		JMenu mnOther = new JMenu("Other");
+		menuBar.add(mnOther);
 		
-		JMenuItem mntmNewMenuItem = new JMenuItem("About...");
-		mnNewMenu.add(mntmNewMenuItem);
-		card = new CardLayout(0, 0);
-		frame.getContentPane().setLayout(card);
+		JMenuItem mntmAbout = new JMenuItem("About");
+		mnOther.add(mntmAbout);
+		mainCard = new CardLayout(0, 0);
+		frame.getContentPane().setLayout(mainCard);
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		frame.getContentPane().add(tabbedPane, "input");
+		JPanel panelInput = new JPanel();
+		frame.getContentPane().add(panelInput, "panelInput");
+		panelInput.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panel = new JPanel();
-		tabbedPane.addTab("Normal Mode", null, panel, null);
-		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[]{0, 0, 0, 80, 0, 70, 0};
-		gbl_panel.rowHeights = new int[]{100, 0, 0, 0, 0, 0, 100, 0};
-		gbl_panel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		panel.setLayout(gbl_panel);
+		tabbedPaneInput = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPaneInput.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelInput.add(tabbedPaneInput, BorderLayout.NORTH);
 		
-		JLabel lblNewLabel = new JLabel("Enter Address");
-		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-		gbc_lblNewLabel.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel.gridwidth = 2;
-		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel.gridx = 0;
-		gbc_lblNewLabel.gridy = 0;
-		panel.add(lblNewLabel, gbc_lblNewLabel);
+		JPanel panelInputFullAddress = new JPanel();
+		panelInputFullAddress.setBorder(new EmptyBorder(5, 10, 5, 10));
+		tabbedPaneInput.addTab("Address", null, panelInputFullAddress, null);
+		GridBagLayout gbl_panelInputFullAddress = new GridBagLayout();
+		gbl_panelInputFullAddress.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panelInputFullAddress.rowHeights = new int[]{0, 0, 0};
+		gbl_panelInputFullAddress.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_panelInputFullAddress.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		panelInputFullAddress.setLayout(gbl_panelInputFullAddress);
 		
-		JLabel lblNewLabel_1 = new JLabel("Address");
-		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
-		gbc_lblNewLabel_1.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_1.gridx = 0;
-		gbc_lblNewLabel_1.gridy = 1;
-		panel.add(lblNewLabel_1, gbc_lblNewLabel_1);
+		JLabel lblAddress = new JLabel("Address");
+		lblAddress.setPreferredSize(new Dimension(45, 20));
+		lblAddress.setMinimumSize(new Dimension(45, 20));
+		lblAddress.setMaximumSize(new Dimension(45, 20));
+		GridBagConstraints gbc_lblAddress = new GridBagConstraints();
+		gbc_lblAddress.anchor = GridBagConstraints.WEST;
+		gbc_lblAddress.insets = new Insets(0, 5, 5, 5);
+		gbc_lblAddress.gridx = 0;
+		gbc_lblAddress.gridy = 0;
+		panelInputFullAddress.add(lblAddress, gbc_lblAddress);
 		
-		textField = new JTextField();
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.gridwidth = 5;
-		gbc_textField.insets = new Insets(0, 0, 5, 0);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 1;
-		gbc_textField.gridy = 1;
-		panel.add(textField, gbc_textField);
-		textField.setColumns(10);
+		txtAddress = new JTextField();
+		txtAddress.setText("405 N Main St");
+		GridBagConstraints gbc_txtAddress = new GridBagConstraints();
+		gbc_txtAddress.insets = new Insets(5, 5, 5, 5);
+		gbc_txtAddress.gridwidth = 11;
+		gbc_txtAddress.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtAddress.gridx = 1;
+		gbc_txtAddress.gridy = 0;
+		panelInputFullAddress.add(txtAddress, gbc_txtAddress);
+		txtAddress.setColumns(10);
 		
-		JLabel lblNewLabel_2 = new JLabel("City");
-		GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
-		gbc_lblNewLabel_2.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_2.gridx = 0;
-		gbc_lblNewLabel_2.gridy = 2;
-		panel.add(lblNewLabel_2, gbc_lblNewLabel_2);
+		JLabel lblCitytown = new JLabel("City/Town");
+		lblCitytown.setPreferredSize(new Dimension(65, 20));
+		lblCitytown.setMinimumSize(new Dimension(65, 20));
+		lblCitytown.setMaximumSize(new Dimension(65, 20));
+		GridBagConstraints gbc_lblCitytown = new GridBagConstraints();
+		gbc_lblCitytown.anchor = GridBagConstraints.WEST;
+		gbc_lblCitytown.insets = new Insets(5, 5, 5, 5);
+		gbc_lblCitytown.gridx = 0;
+		gbc_lblCitytown.gridy = 1;
+		panelInputFullAddress.add(lblCitytown, gbc_lblCitytown);
 		
-		textField_1 = new JTextField();
-		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
-		gbc_textField_1.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_1.gridx = 1;
-		gbc_textField_1.gridy = 2;
-		panel.add(textField_1, gbc_textField_1);
-		textField_1.setColumns(10);
+		txtCitytown = new JTextField();
+		txtCitytown.setText("Sharon");
+		GridBagConstraints gbc_txtCitytown = new GridBagConstraints();
+		gbc_txtCitytown.insets = new Insets(5, 5, 5, 5);
+		gbc_txtCitytown.gridwidth = 3;
+		gbc_txtCitytown.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtCitytown.gridx = 1;
+		gbc_txtCitytown.gridy = 1;
+		panelInputFullAddress.add(txtCitytown, gbc_txtCitytown);
+		txtCitytown.setColumns(10);
 		
-		JLabel lblNewLabel_3 = new JLabel("State");
-		GridBagConstraints gbc_lblNewLabel_3 = new GridBagConstraints();
-		gbc_lblNewLabel_3.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_3.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_3.gridx = 2;
-		gbc_lblNewLabel_3.gridy = 2;
-		panel.add(lblNewLabel_3, gbc_lblNewLabel_3);
+		JLabel lblState = new JLabel("State");
+		GridBagConstraints gbc_lblState = new GridBagConstraints();
+		gbc_lblState.insets = new Insets(5, 5, 5, 5);
+		gbc_lblState.anchor = GridBagConstraints.WEST;
+		gbc_lblState.gridx = 4;
+		gbc_lblState.gridy = 1;
+		panelInputFullAddress.add(lblState, gbc_lblState);
 		
-		textField_2 = new JTextField();
-		GridBagConstraints gbc_textField_2 = new GridBagConstraints();
-		gbc_textField_2.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_2.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_2.gridx = 3;
-		gbc_textField_2.gridy = 2;
-		panel.add(textField_2, gbc_textField_2);
-		textField_2.setColumns(10);
-		textField_2.setText("ma");
+		txtState = new JTextField();
+		txtState.setText("MA");
+		GridBagConstraints gbc_txtState = new GridBagConstraints();
+		gbc_txtState.insets = new Insets(5, 5, 5, 5);
+		gbc_txtState.gridwidth = 3;
+		gbc_txtState.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtState.gridx = 5;
+		gbc_txtState.gridy = 1;
+		panelInputFullAddress.add(txtState, gbc_txtState);
+		txtState.setColumns(10);
 		
-		JLabel lblNewLabel_4 = new JLabel("Zip");
-		GridBagConstraints gbc_lblNewLabel_4 = new GridBagConstraints();
-		gbc_lblNewLabel_4.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_4.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_4.gridx = 4;
-		gbc_lblNewLabel_4.gridy = 2;
-		panel.add(lblNewLabel_4, gbc_lblNewLabel_4);
+		JLabel lblZip = new JLabel("Zip");
+		GridBagConstraints gbc_lblZip = new GridBagConstraints();
+		gbc_lblZip.insets = new Insets(5, 5, 5, 5);
+		gbc_lblZip.anchor = GridBagConstraints.WEST;
+		gbc_lblZip.gridx = 8;
+		gbc_lblZip.gridy = 1;
+		panelInputFullAddress.add(lblZip, gbc_lblZip);
 		
-		textField_3 = new JTextField();
-		GridBagConstraints gbc_textField_3 = new GridBagConstraints();
-		gbc_textField_3.insets = new Insets(0, 0, 5, 0);
-		gbc_textField_3.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_3.gridx = 5;
-		gbc_textField_3.gridy = 2;
-		panel.add(textField_3, gbc_textField_3);
-		textField_3.setColumns(10);
-		textField_3.setText("02067");
+		txtZip = new JTextField();
+		txtZip.setText("02067");
+		GridBagConstraints gbc_txtZip = new GridBagConstraints();
+		gbc_txtZip.insets = new Insets(5, 5, 5, 5);
+		gbc_txtZip.gridwidth = 3;
+		gbc_txtZip.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtZip.gridx = 9;
+		gbc_txtZip.gridy = 1;
+		panelInputFullAddress.add(txtZip, gbc_txtZip);
+		txtZip.setColumns(10);
+		
+		JPanel panelInputZip = new JPanel();
+		panelInputZip.setBorder(new EmptyBorder(5, 10, 5, 10));
+		tabbedPaneInput.addTab("City/Town", null, panelInputZip, null);
+		GridBagLayout gbl_panelInputZip = new GridBagLayout();
+		gbl_panelInputZip.columnWidths = new int[]{0, 0, 0, 0};
+		gbl_panelInputZip.rowHeights = new int[]{0, 0, 0};
+		gbl_panelInputZip.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panelInputZip.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		panelInputZip.setLayout(gbl_panelInputZip);
+		
+		JLabel lblZip_1 = new JLabel("Zip");
+		GridBagConstraints gbc_lblZip_1 = new GridBagConstraints();
+		gbc_lblZip_1.insets = new Insets(5, 5, 5, 5);
+		gbc_lblZip_1.gridx = 0;
+		gbc_lblZip_1.gridy = 0;
+		panelInputZip.add(lblZip_1, gbc_lblZip_1);
+		
+		txtZip_1 = new JTextField();
+		GridBagConstraints gbc_txtZip_1 = new GridBagConstraints();
+		gbc_txtZip_1.insets = new Insets(5, 5, 5, 5);
+		gbc_txtZip_1.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtZip_1.gridx = 1;
+		gbc_txtZip_1.gridy = 0;
+		panelInputZip.add(txtZip_1, gbc_txtZip_1);
+		txtZip_1.setColumns(10);
+		
+		JLabel lblBlend = new JLabel("Blend");
+		lblBlend.setVisible(false);
+		GridBagConstraints gbc_lblBlend = new GridBagConstraints();
+		gbc_lblBlend.gridwidth = 10;
+		gbc_lblBlend.insets = new Insets(0, 0, 0, 5);
+		gbc_lblBlend.gridx = 2;
+		gbc_lblBlend.gridy = 0;
+		panelInputZip.add(lblBlend, gbc_lblBlend);
+		
+		JPanel panelInputOption = new JPanel();
+		panelInput.add(panelInputOption, BorderLayout.CENTER);
+		panelInputOption.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panelMethod = new JPanel();
+		panelMethod.setBorder(new EmptyBorder(5, 5, 5, 5));
+		panelInputOption.add(panelMethod, BorderLayout.NORTH);
+		panelMethod.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+		
+		JLabel lblMethod = new JLabel("Method");
+		lblMethod.setHorizontalAlignment(SwingConstants.LEFT);
+		lblMethod.setBorder(new EmptyBorder(0, 0, 0, 5));
+		panelMethod.add(lblMethod);
+		
+		comboBoxMethod = new JComboBox<String>();
+		panelMethod.add(comboBoxMethod);
+		comboBoxMethod.addItem("Price Per Square Feet");
+		comboBoxMethod.addItem("Linear Regression");
+		comboBoxMethod.addItem("Semi-Log (Log-Linear) Regression");
+		comboBoxMethod.addItem("Semi-Log (Linear-Log) Regression");
+		comboBoxMethod.addItem("Log-Log Regression");
+		comboBoxMethod.addItem("Box-Cox Transform Regression");
+		comboBoxMethod.addActionListener(new ActionListener() {
+			@Override
+		    public void actionPerformed(ActionEvent e) {
+				int index = comboBoxMethod.getSelectedIndex();
+		    	if(index == 5){
+		    		chckbxPrice.setVisible(true);
+		    		chckbxFloorSize.setVisible(true);
+		    		chckbxLotSize.setVisible(true);
+		    		chckbxBedroomNumber.setVisible(true);
+		    		chckbxBathroomNumber.setVisible(true);
+		    		chckbxHouseAge.setVisible(true);
+		    		chckbxUseBasePrice.setVisible(true);
+		    		chckbxTransferPrice.setVisible(true);
+		    		chckbxTransferFloorSize.setVisible(true);
+		    		chckbxTransferLotSize.setVisible(true);
+		    	}
+		    	else if(index == 0){
+		    		chckbxPrice.setVisible(false);
+		    		chckbxFloorSize.setVisible(false);
+		    		chckbxLotSize.setVisible(false);
+		    		chckbxBedroomNumber.setVisible(false);
+		    		chckbxBathroomNumber.setVisible(false);
+		    		chckbxHouseAge.setVisible(false);
+		    		chckbxUseBasePrice.setVisible(false);
+		    		chckbxTransferPrice.setVisible(false);
+		    		chckbxTransferFloorSize.setVisible(false);
+		    		chckbxTransferLotSize.setVisible(false);
+		    	}
+		    	else{
+		    		chckbxPrice.setVisible(true);
+		    		chckbxFloorSize.setVisible(true);
+		    		chckbxLotSize.setVisible(true);
+		    		chckbxBedroomNumber.setVisible(true);
+		    		chckbxBathroomNumber.setVisible(true);
+		    		chckbxHouseAge.setVisible(true);
+		    		chckbxUseBasePrice.setVisible(true);
+		    		chckbxTransferPrice.setVisible(false);
+		    		chckbxTransferFloorSize.setVisible(false);
+		    		chckbxTransferLotSize.setVisible(false);
+		    	}
+		    }
+		});
+		
+		JPanel panelOption = new JPanel();
+		panelOption.setBorder(new EmptyBorder(5, 5, 5, 5));
+		panelInputOption.add(panelOption, BorderLayout.CENTER);
+		GridBagLayout gbl_panelOption = new GridBagLayout();
+		gbl_panelOption.columnWidths = new int[]{0, 0, 0, 0};
+		gbl_panelOption.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panelOption.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panelOption.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		panelOption.setLayout(gbl_panelOption);
+		
+		JLabel lblOption = new JLabel("Option");
+		GridBagConstraints gbc_lblOption = new GridBagConstraints();
+		gbc_lblOption.anchor = GridBagConstraints.WEST;
+		gbc_lblOption.insets = new Insets(0, 5, 5, 5);
+		gbc_lblOption.gridx = 0;
+		gbc_lblOption.gridy = 0;
+		panelOption.add(lblOption, gbc_lblOption);
+		
+		chckbxPrice = new JCheckBox("Price");
+		chckbxPrice.setVisible(false);
+		chckbxPrice.setSelected(true);
+		chckbxPrice.setEnabled(false);
+		GridBagConstraints gbc_chckbxPrice = new GridBagConstraints();
+		gbc_chckbxPrice.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxPrice.anchor = GridBagConstraints.WEST;
+		gbc_chckbxPrice.gridx = 0;
+		gbc_chckbxPrice.gridy = 1;
+		panelOption.add(chckbxPrice, gbc_chckbxPrice);
+		
+		chckbxTransferPrice = new JCheckBox("Transfer Price");
+		chckbxTransferPrice.setVisible(false);
+		GridBagConstraints gbc_chckbxTransferPrice = new GridBagConstraints();
+		gbc_chckbxTransferPrice.anchor = GridBagConstraints.WEST;
+		gbc_chckbxTransferPrice.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxTransferPrice.gridx = 1;
+		gbc_chckbxTransferPrice.gridy = 1;
+		panelOption.add(chckbxTransferPrice, gbc_chckbxTransferPrice);
 		
 		chckbxFloorSize = new JCheckBox("Floor Size");
+		chckbxFloorSize.setVisible(false);
 		chckbxFloorSize.setEnabled(false);
 		chckbxFloorSize.setSelected(true);
 		GridBagConstraints gbc_chckbxFloorSize = new GridBagConstraints();
 		gbc_chckbxFloorSize.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxFloorSize.anchor = GridBagConstraints.WEST;
 		gbc_chckbxFloorSize.gridx = 0;
-		gbc_chckbxFloorSize.gridy = 4;
-		panel.add(chckbxFloorSize, gbc_chckbxFloorSize);
+		gbc_chckbxFloorSize.gridy = 2;
+		panelOption.add(chckbxFloorSize, gbc_chckbxFloorSize);
+		
+		chckbxTransferFloorSize = new JCheckBox("Transfer Floor Size");
+		chckbxTransferFloorSize.setVisible(false);
+		GridBagConstraints gbc_chckbxTransferFloorSize = new GridBagConstraints();
+		gbc_chckbxTransferFloorSize.anchor = GridBagConstraints.WEST;
+		gbc_chckbxTransferFloorSize.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxTransferFloorSize.gridx = 1;
+		gbc_chckbxTransferFloorSize.gridy = 2;
+		panelOption.add(chckbxTransferFloorSize, gbc_chckbxTransferFloorSize);
 		
 		chckbxLotSize = new JCheckBox("Lot Size");
-		chckbxLotSize.setEnabled(false);
-		chckbxLotSize.setSelected(true);
+		chckbxLotSize.setVisible(false);
 		GridBagConstraints gbc_chckbxLotSize = new GridBagConstraints();
+		gbc_chckbxLotSize.anchor = GridBagConstraints.WEST;
 		gbc_chckbxLotSize.insets = new Insets(0, 0, 5, 5);
-		gbc_chckbxLotSize.gridx = 1;
-		gbc_chckbxLotSize.gridy = 4;
-		panel.add(chckbxLotSize, gbc_chckbxLotSize);
+		gbc_chckbxLotSize.gridx = 0;
+		gbc_chckbxLotSize.gridy = 3;
+		panelOption.add(chckbxLotSize, gbc_chckbxLotSize);
 		
-		chckbxBedroom = new JCheckBox("Bedroom");
-		GridBagConstraints gbc_chckbxBedroom = new GridBagConstraints();
-		gbc_chckbxBedroom.insets = new Insets(0, 0, 5, 5);
-		gbc_chckbxBedroom.gridx = 2;
-		gbc_chckbxBedroom.gridy = 4;
-		panel.add(chckbxBedroom, gbc_chckbxBedroom);
+		chckbxTransferLotSize = new JCheckBox("Transfer Lot Size");
+		chckbxTransferLotSize.setVisible(false);
+		GridBagConstraints gbc_chckbxTransferLotSize = new GridBagConstraints();
+		gbc_chckbxTransferLotSize.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxTransferLotSize.anchor = GridBagConstraints.WEST;
+		gbc_chckbxTransferLotSize.gridx = 1;
+		gbc_chckbxTransferLotSize.gridy = 3;
+		panelOption.add(chckbxTransferLotSize, gbc_chckbxTransferLotSize);
 		
-		chckbxBathroom = new JCheckBox("Bathroom");
-		GridBagConstraints gbc_chckbxBathroom = new GridBagConstraints();
-		gbc_chckbxBathroom.insets = new Insets(0, 0, 5, 5);
-		gbc_chckbxBathroom.gridx = 3;
-		gbc_chckbxBathroom.gridy = 4;
-		panel.add(chckbxBathroom, gbc_chckbxBathroom);
+		JLabel lblBlend_1 = new JLabel(" ");
+		GridBagConstraints gbc_lblBlend_1 = new GridBagConstraints();
+		gbc_lblBlend_1.insets = new Insets(0, 0, 5, 5);
+		gbc_lblBlend_1.gridx = 0;
+		gbc_lblBlend_1.gridy = 4;
+		panelOption.add(lblBlend_1, gbc_lblBlend_1);
 		
-		chckbxAge = new JCheckBox("Age");
-		GridBagConstraints gbc_chckbxAge = new GridBagConstraints();
-		gbc_chckbxAge.insets = new Insets(0, 0, 5, 5);
-		gbc_chckbxAge.gridx = 4;
-		gbc_chckbxAge.gridy = 4;
-		panel.add(chckbxAge, gbc_chckbxAge);
+		chckbxBedroomNumber = new JCheckBox("Bedroom Number");
+		chckbxBedroomNumber.setVisible(false);
+		GridBagConstraints gbc_chckbxBedroomNumber = new GridBagConstraints();
+		gbc_chckbxBedroomNumber.anchor = GridBagConstraints.WEST;
+		gbc_chckbxBedroomNumber.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxBedroomNumber.gridx = 0;
+		gbc_chckbxBedroomNumber.gridy = 5;
+		panelOption.add(chckbxBedroomNumber, gbc_chckbxBedroomNumber);
 		
-		chckbxRegressionContainBase = new JCheckBox("Regression Contain Base Price");
-		GridBagConstraints gbc_chckbxRegressionContainBase = new GridBagConstraints();
-		gbc_chckbxRegressionContainBase.gridwidth = 2;
-		gbc_chckbxRegressionContainBase.insets = new Insets(0, 0, 5, 5);
-		gbc_chckbxRegressionContainBase.gridx = 0;
-		gbc_chckbxRegressionContainBase.gridy = 5;
-		panel.add(chckbxRegressionContainBase, gbc_chckbxRegressionContainBase);
+		chckbxBathroomNumber = new JCheckBox("Bathroom Number");
+		chckbxBathroomNumber.setVisible(false);
+		GridBagConstraints gbc_chckbxBathroomNumber = new GridBagConstraints();
+		gbc_chckbxBathroomNumber.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxBathroomNumber.anchor = GridBagConstraints.WEST;
+		gbc_chckbxBathroomNumber.gridx = 1;
+		gbc_chckbxBathroomNumber.gridy = 5;
+		panelOption.add(chckbxBathroomNumber, gbc_chckbxBathroomNumber);
 		
-		JButton btnNewButton = new JButton("Start");
-		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
-		gbc_btnNewButton.gridwidth = 6;
-		gbc_btnNewButton.gridx = 0;
-		gbc_btnNewButton.gridy = 6;
-		panel.add(btnNewButton, gbc_btnNewButton);
-		startButton = btnNewButton;
+		chckbxHouseAge = new JCheckBox("House Age");
+		chckbxHouseAge.setVisible(false);
+		GridBagConstraints gbc_chckbxHouseAge = new GridBagConstraints();
+		gbc_chckbxHouseAge.insets = new Insets(0, 0, 5, 0);
+		gbc_chckbxHouseAge.anchor = GridBagConstraints.WEST;
+		gbc_chckbxHouseAge.gridx = 2;
+		gbc_chckbxHouseAge.gridy = 5;
+		panelOption.add(chckbxHouseAge, gbc_chckbxHouseAge);
 		
-		textField.setText("9 ginger way");
-		textField_1.setText("Sharon");
+		chckbxUseBasePrice = new JCheckBox("Use Base Price on Regression");
+		chckbxUseBasePrice.setVisible(false);
+		GridBagConstraints gbc_chckbxUseBasePrice = new GridBagConstraints();
+		gbc_chckbxUseBasePrice.anchor = GridBagConstraints.WEST;
+		gbc_chckbxUseBasePrice.gridwidth = 2;
+		gbc_chckbxUseBasePrice.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxUseBasePrice.gridx = 0;
+		gbc_chckbxUseBasePrice.gridy = 6;
+		panelOption.add(chckbxUseBasePrice, gbc_chckbxUseBasePrice);
 		
-		JPanel panel_6 = new JPanel();
-		panel_6.setBorder(new EmptyBorder(10, 10, 10, 10));
-		tabbedPane.addTab("Test Mode", null, panel_6, null);
-		GridBagLayout gbl_panel_6 = new GridBagLayout();
-		gbl_panel_6.columnWidths = new int[]{0, 0, 0, 80, 0, 70, 0};
-		gbl_panel_6.rowHeights = new int[]{100, 0, 0, 0, 0, 0, 100, 0};
-		gbl_panel_6.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel_6.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		panel_6.setLayout(gbl_panel_6);
+		JLabel lblSampleNumber = new JLabel("Sample Number");
+		GridBagConstraints gbc_lblSampleNumber = new GridBagConstraints();
+		gbc_lblSampleNumber.anchor = GridBagConstraints.WEST;
+		gbc_lblSampleNumber.insets = new Insets(0, 5, 0, 5);
+		gbc_lblSampleNumber.gridx = 0;
+		gbc_lblSampleNumber.gridy = 7;
+		panelOption.add(lblSampleNumber, gbc_lblSampleNumber);
 		
-		checkBox = new JCheckBox("Floor Size");
-		checkBox.setSelected(true);
-		checkBox.setEnabled(false);
-		GridBagConstraints gbc_checkBox = new GridBagConstraints();
-		gbc_checkBox.insets = new Insets(0, 0, 5, 5);
-		gbc_checkBox.gridx = 0;
-		gbc_checkBox.gridy = 4;
-		panel_6.add(checkBox, gbc_checkBox);
+		sampleNumberSpinner = new JSpinner();
+		sampleNumberSpinner.setModel(new SpinnerNumberModel(1, 1, 200, 1));
+		GridBagConstraints gbc_spinner = new GridBagConstraints();
+		gbc_spinner.anchor = GridBagConstraints.WEST;
+		gbc_spinner.insets = new Insets(0, 0, 0, 5);
+		gbc_spinner.gridx = 1;
+		gbc_spinner.gridy = 7;
+		panelOption.add(sampleNumberSpinner, gbc_spinner);
 		
-		checkBox_1 = new JCheckBox("Lot Size");
-		checkBox_1.setSelected(true);
-		checkBox_1.setEnabled(false);
-		GridBagConstraints gbc_checkBox_1 = new GridBagConstraints();
-		gbc_checkBox_1.insets = new Insets(0, 0, 5, 5);
-		gbc_checkBox_1.gridx = 1;
-		gbc_checkBox_1.gridy = 4;
-		panel_6.add(checkBox_1, gbc_checkBox_1);
+		JPanel panelStartButton = new JPanel();
+		panelInputOption.add(panelStartButton, BorderLayout.SOUTH);
 		
-		checkBox_2 = new JCheckBox("Bedroom");
-		GridBagConstraints gbc_checkBox_2 = new GridBagConstraints();
-		gbc_checkBox_2.insets = new Insets(0, 0, 5, 5);
-		gbc_checkBox_2.gridx = 2;
-		gbc_checkBox_2.gridy = 4;
-		panel_6.add(checkBox_2, gbc_checkBox_2);
+		btnStart = new JButton("Start");
+		panelStartButton.add(btnStart);
 		
-		checkBox_3 = new JCheckBox("Bathroom");
-		GridBagConstraints gbc_checkBox_3 = new GridBagConstraints();
-		gbc_checkBox_3.insets = new Insets(0, 0, 5, 5);
-		gbc_checkBox_3.gridx = 3;
-		gbc_checkBox_3.gridy = 4;
-		panel_6.add(checkBox_3, gbc_checkBox_3);
+		JPanel panelProcessing = new JPanel();
+		panelProcessing.setBorder(new EmptyBorder(5, 5, 5, 5));
+		frame.getContentPane().add(panelProcessing, "panelProcessing");
+		GridBagLayout gbl_panelProcessing = new GridBagLayout();
+		gbl_panelProcessing.columnWidths = new int[]{0, 0};
+		gbl_panelProcessing.rowHeights = new int[]{0, 0, 0, 0};
+		gbl_panelProcessing.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_panelProcessing.rowWeights = new double[]{1.0, 0.0, 1.0, Double.MIN_VALUE};
+		panelProcessing.setLayout(gbl_panelProcessing);
 		
-		checkBox_4 = new JCheckBox("Age");
-		GridBagConstraints gbc_checkBox_4 = new GridBagConstraints();
-		gbc_checkBox_4.insets = new Insets(0, 0, 5, 5);
-		gbc_checkBox_4.gridx = 4;
-		gbc_checkBox_4.gridy = 4;
-		panel_6.add(checkBox_4, gbc_checkBox_4);
+		processingStatus = new JLabel("Processing...");
+		GridBagConstraints gbc_lblProcessing = new GridBagConstraints();
+		gbc_lblProcessing.weighty = 2.0;
+		gbc_lblProcessing.anchor = GridBagConstraints.SOUTH;
+		gbc_lblProcessing.insets = new Insets(0, 0, 5, 0);
+		gbc_lblProcessing.gridx = 0;
+		gbc_lblProcessing.gridy = 0;
+		panelProcessing.add(processingStatus, gbc_lblProcessing);
 		
-		checkBox_5 = new JCheckBox("Regression Contain Base Price");
-		GridBagConstraints gbc_checkBox_5 = new GridBagConstraints();
-		gbc_checkBox_5.gridwidth = 2;
-		gbc_checkBox_5.insets = new Insets(0, 0, 5, 5);
-		gbc_checkBox_5.gridx = 0;
-		gbc_checkBox_5.gridy = 5;
-		panel_6.add(checkBox_5, gbc_checkBox_5);
-		
-		JButton button = new JButton("Start");
-		startTestButton = button;
-		GridBagConstraints gbc_button = new GridBagConstraints();
-		gbc_button.gridwidth = 6;
-		gbc_button.gridx = 0;
-		gbc_button.gridy = 6;
-		panel_6.add(button, gbc_button);
-		
-		JPanel panel_1 = new JPanel();
-		frame.getContentPane().add(panel_1, "processing");
-		GridBagLayout gbl_panel_1 = new GridBagLayout();
-		gbl_panel_1.columnWidths = new int[]{0, 0};
-		gbl_panel_1.rowHeights = new int[]{0, 0, 40, 0, 0};
-		gbl_panel_1.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_panel_1.rowWeights = new double[]{1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-		panel_1.setLayout(gbl_panel_1);
-		
-		JLabel lblNewLabel_5 = new JLabel("Processing");
-		GridBagConstraints gbc_lblNewLabel_5 = new GridBagConstraints();
-		gbc_lblNewLabel_5.insets = new Insets(0, 0, 5, 0);
-		gbc_lblNewLabel_5.gridx = 0;
-		gbc_lblNewLabel_5.gridy = 0;
-		panel_1.add(lblNewLabel_5, gbc_lblNewLabel_5);
-		
-		JLabel lblNewLabel_6 = new JLabel("  ");
-		status = lblNewLabel_6;
-		GridBagConstraints gbc_lblNewLabel_6 = new GridBagConstraints();
-		gbc_lblNewLabel_6.insets = new Insets(0, 0, 5, 0);
-		gbc_lblNewLabel_6.gridx = 0;
-		gbc_lblNewLabel_6.gridy = 1;
-		panel_1.add(lblNewLabel_6, gbc_lblNewLabel_6);
-		
-		JPanel panel_5 = new JPanel();
-		panel_5.setBorder(new EmptyBorder(0, 20, 0, 20));
-		GridBagConstraints gbc_panel_5 = new GridBagConstraints();
-		gbc_panel_5.fill = GridBagConstraints.BOTH;
-		gbc_panel_5.insets = new Insets(0, 0, 5, 0);
-		gbc_panel_5.gridx = 0;
-		gbc_panel_5.gridy = 2;
-		panel_1.add(panel_5, gbc_panel_5);
-		GridBagLayout gbl_panel_5 = new GridBagLayout();
-		gbl_panel_5.columnWidths = new int[]{0, 0};
-		gbl_panel_5.rowHeights = new int[]{40, 0};
-		gbl_panel_5.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_panel_5.rowWeights = new double[]{0.0, Double.MIN_VALUE};
-		panel_5.setLayout(gbl_panel_5);
-		
-		JProgressBar progressBar = new JProgressBar();
+		processingProgressBar = new JProgressBar();
 		GridBagConstraints gbc_progressBar = new GridBagConstraints();
+		gbc_progressBar.weighty = 1.0;
+		gbc_progressBar.insets = new Insets(0, 10, 5, 10);
 		gbc_progressBar.fill = GridBagConstraints.HORIZONTAL;
 		gbc_progressBar.gridx = 0;
-		gbc_progressBar.gridy = 0;
-		panel_5.add(progressBar, gbc_progressBar);
-		processingProgressBar = progressBar;
+		gbc_progressBar.gridy = 1;
+		panelProcessing.add(processingProgressBar, gbc_progressBar);
 		
-		JButton btnNewButton_1 = new JButton("Cancel");
-		cancelButton = btnNewButton_1;
-		GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
-		gbc_btnNewButton_1.gridx = 0;
-		gbc_btnNewButton_1.gridy = 3;
-		panel_1.add(btnNewButton_1, gbc_btnNewButton_1);
+		btnCancel = new JButton("Cancel");
+
+		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
+		gbc_btnCancel.weighty = 2.0;
+		gbc_btnCancel.anchor = GridBagConstraints.NORTH;
+		gbc_btnCancel.gridx = 0;
+		gbc_btnCancel.gridy = 2;
+		panelProcessing.add(btnCancel, gbc_btnCancel);
 		
-		JPanel panel_2 = new JPanel();
-		panel_2.setBorder(null);
-		frame.getContentPane().add(panel_2, "result");
-		panel_2.setLayout(new BorderLayout(0, 0));
+		JPanel panelResult = new JPanel();
+		frame.getContentPane().add(panelResult, "panelResult");
+		panelResult.setLayout(new BorderLayout(0, 0));
 		
-		JSplitPane splitPane = new JSplitPane();
-		splitPane.setResizeWeight(0.5);
-		panel_2.add(splitPane, BorderLayout.CENTER);
+		JPanel panelResultRestart = new JPanel();
+		panelResult.add(panelResultRestart, BorderLayout.SOUTH);
 		
-		JPanel panel_3 = new JPanel();
-		panel_3.setBorder(new EmptyBorder(10, 10, 10, 10));
-		splitPane.setLeftComponent(panel_3);
-		GridBagLayout gbl_panel_3 = new GridBagLayout();
-		gbl_panel_3.columnWidths = new int[]{0, 0, 0};
-		gbl_panel_3.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_panel_3.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
-		gbl_panel_3.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		panel_3.setLayout(gbl_panel_3);
+		btnRestart = new JButton("Restart");
+		panelResultRestart.add(btnRestart);
 		
-		JLabel lblNewLabel_7 = new JLabel("Result:");
-		GridBagConstraints gbc_lblNewLabel_7 = new GridBagConstraints();
-		gbc_lblNewLabel_7.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_7.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_7.gridx = 0;
-		gbc_lblNewLabel_7.gridy = 0;
-		panel_3.add(lblNewLabel_7, gbc_lblNewLabel_7);
+		JPanel panelAreaResult = new JPanel();
+		frame.getContentPane().add(panelAreaResult, "panelAreaResult");
+		panelAreaResult.setLayout(new BorderLayout(0, 0));
 		
-		JLabel lblNewLabel_8 = new JLabel("Predict Price");
-		GridBagConstraints gbc_lblNewLabel_8 = new GridBagConstraints();
-		gbc_lblNewLabel_8.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_8.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_8.gridx = 0;
-		gbc_lblNewLabel_8.gridy = 1;
-		panel_3.add(lblNewLabel_8, gbc_lblNewLabel_8);
+		JPanel panelAreaResultRestart = new JPanel();
+		panelAreaResult.add(panelAreaResultRestart, BorderLayout.SOUTH);
 		
-		textField_4 = new JTextField();
-		textField_4.setEditable(false);
-		GridBagConstraints gbc_textField_4 = new GridBagConstraints();
-		gbc_textField_4.insets = new Insets(0, 0, 5, 0);
-		gbc_textField_4.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_4.gridx = 1;
-		gbc_textField_4.gridy = 1;
-		panel_3.add(textField_4, gbc_textField_4);
-		textField_4.setColumns(10);
-		
-		JLabel lblNewLabel_11 = new JLabel("Target Info:");
-		GridBagConstraints gbc_lblNewLabel_11 = new GridBagConstraints();
-		gbc_lblNewLabel_11.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_11.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_11.gridx = 0;
-		gbc_lblNewLabel_11.gridy = 2;
-		panel_3.add(lblNewLabel_11, gbc_lblNewLabel_11);
-		
-		JLabel lblNewLabel_9 = new JLabel("Last Sold Price");
-		GridBagConstraints gbc_lblNewLabel_9 = new GridBagConstraints();
-		gbc_lblNewLabel_9.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_9.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_9.gridx = 0;
-		gbc_lblNewLabel_9.gridy = 3;
-		panel_3.add(lblNewLabel_9, gbc_lblNewLabel_9);
-		
-		textField_5 = new JTextField();
-		textField_5.setEditable(false);
-		GridBagConstraints gbc_textField_5 = new GridBagConstraints();
-		gbc_textField_5.insets = new Insets(0, 0, 5, 0);
-		gbc_textField_5.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_5.gridx = 1;
-		gbc_textField_5.gridy = 3;
-		panel_3.add(textField_5, gbc_textField_5);
-		textField_5.setColumns(10);
-		
-		JLabel lblNewLabel_10 = new JLabel("Last Sold Year");
-		GridBagConstraints gbc_lblNewLabel_10 = new GridBagConstraints();
-		gbc_lblNewLabel_10.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_10.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_10.gridx = 0;
-		gbc_lblNewLabel_10.gridy = 4;
-		panel_3.add(lblNewLabel_10, gbc_lblNewLabel_10);
-		
-		textField_6 = new JTextField();
-		textField_6.setEditable(false);
-		GridBagConstraints gbc_textField_6 = new GridBagConstraints();
-		gbc_textField_6.insets = new Insets(0, 0, 5, 0);
-		gbc_textField_6.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_6.gridx = 1;
-		gbc_textField_6.gridy = 4;
-		panel_3.add(textField_6, gbc_textField_6);
-		textField_6.setColumns(10);
-		
-		JLabel lblNewLabel_12 = new JLabel("Floor Size");
-		GridBagConstraints gbc_lblNewLabel_12 = new GridBagConstraints();
-		gbc_lblNewLabel_12.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_12.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_12.gridx = 0;
-		gbc_lblNewLabel_12.gridy = 5;
-		panel_3.add(lblNewLabel_12, gbc_lblNewLabel_12);
-		
-		textField_7 = new JTextField();
-		textField_7.setEditable(false);
-		GridBagConstraints gbc_textField_7 = new GridBagConstraints();
-		gbc_textField_7.insets = new Insets(0, 0, 5, 0);
-		gbc_textField_7.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_7.gridx = 1;
-		gbc_textField_7.gridy = 5;
-		panel_3.add(textField_7, gbc_textField_7);
-		textField_7.setColumns(10);
-		
-		JLabel lblNewLabel_13 = new JLabel("Lot Size");
-		GridBagConstraints gbc_lblNewLabel_13 = new GridBagConstraints();
-		gbc_lblNewLabel_13.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_13.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_13.gridx = 0;
-		gbc_lblNewLabel_13.gridy = 6;
-		panel_3.add(lblNewLabel_13, gbc_lblNewLabel_13);
-		
-		textField_8 = new JTextField();
-		textField_8.setEditable(false);
-		GridBagConstraints gbc_textField_8 = new GridBagConstraints();
-		gbc_textField_8.insets = new Insets(0, 0, 5, 0);
-		gbc_textField_8.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_8.gridx = 1;
-		gbc_textField_8.gridy = 6;
-		panel_3.add(textField_8, gbc_textField_8);
-		textField_8.setColumns(10);
-		
-		JLabel lblNewLabel_14 = new JLabel("Bedroom");
-		GridBagConstraints gbc_lblNewLabel_14 = new GridBagConstraints();
-		gbc_lblNewLabel_14.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_14.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_14.gridx = 0;
-		gbc_lblNewLabel_14.gridy = 7;
-		panel_3.add(lblNewLabel_14, gbc_lblNewLabel_14);
-		
-		textField_9 = new JTextField();
-		textField_9.setEditable(false);
-		GridBagConstraints gbc_textField_9 = new GridBagConstraints();
-		gbc_textField_9.insets = new Insets(0, 0, 5, 0);
-		gbc_textField_9.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_9.gridx = 1;
-		gbc_textField_9.gridy = 7;
-		panel_3.add(textField_9, gbc_textField_9);
-		textField_9.setColumns(10);
-		
-		JLabel lblNewLabel_15 = new JLabel("Bathroom");
-		GridBagConstraints gbc_lblNewLabel_15 = new GridBagConstraints();
-		gbc_lblNewLabel_15.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_15.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_15.gridx = 0;
-		gbc_lblNewLabel_15.gridy = 8;
-		panel_3.add(lblNewLabel_15, gbc_lblNewLabel_15);
-		
-		textField_10 = new JTextField();
-		textField_10.setEditable(false);
-		GridBagConstraints gbc_textField_10 = new GridBagConstraints();
-		gbc_textField_10.insets = new Insets(0, 0, 5, 0);
-		gbc_textField_10.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_10.gridx = 1;
-		gbc_textField_10.gridy = 8;
-		panel_3.add(textField_10, gbc_textField_10);
-		textField_10.setColumns(10);
-		
-		JLabel lblNewLabel_16 = new JLabel("Year Built");
-		GridBagConstraints gbc_lblNewLabel_16 = new GridBagConstraints();
-		gbc_lblNewLabel_16.anchor = GridBagConstraints.WEST;
-		gbc_lblNewLabel_16.insets = new Insets(0, 0, 0, 5);
-		gbc_lblNewLabel_16.gridx = 0;
-		gbc_lblNewLabel_16.gridy = 9;
-		panel_3.add(lblNewLabel_16, gbc_lblNewLabel_16);
-		
-		textField_11 = new JTextField();
-		textField_11.setEditable(false);
-		GridBagConstraints gbc_textField_11 = new GridBagConstraints();
-		gbc_textField_11.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_11.gridx = 1;
-		gbc_textField_11.gridy = 9;
-		panel_3.add(textField_11, gbc_textField_11);
-		textField_11.setColumns(10);
-		
-		JPanel panel_4 = new JPanel();
-		panel_2.add(panel_4, BorderLayout.SOUTH);
-		
-		JButton btnNewButton_2 = new JButton("Start a New Prediction");
-		panel_4.add(btnNewButton_2);
-		restartButton = btnNewButton_2;
-		
-		JPanel panel_7 = new JPanel();
-		frame.getContentPane().add(panel_7, "testResult");
-		panel_7.setLayout(new BorderLayout(0, 0));
-		
-		JPanel panel_8 = new JPanel();
-		panel_7.add(panel_8, BorderLayout.SOUTH);
-		
-		JButton button_1 = new JButton("Start a New Prediction");
-		restartTestButton = button_1;
-		panel_8.add(button_1);
-		
+		btnRestart_1 = new JButton("Restart");
+		panelAreaResultRestart.add(btnRestart_1);
 	}
-    public void addStartListener(ActionListener start){
-    	startButton.addActionListener(start);
+	
+    public void showInputCard() {
+    	mainCard.show(frame.getContentPane(), "panelInput");
+    }
+    public void showProcessingCard() {
+    	mainCard.show(frame.getContentPane(), "panelProcessing");
+    }
+    public void showResultCard() {
+    	mainCard.show(frame.getContentPane(), "panelResult");
+    }
+    public void showAreaResultCard() {
+    	mainCard.show(frame.getContentPane(), "panelAreaResult");
+    }
+	
+	
+	
+	public void addStartListener(ActionListener a){
+    	btnStart.addActionListener(a);
+    }
+	public void addCancelListener(ActionListener a){
+    	btnCancel.addActionListener(a);
+    }
+	public void addRestartListener(ActionListener a){
+		btnRestart.addActionListener(a);
+		btnRestart_1.addActionListener(a);
+    }
+	
+	public int getSelectedMode() {
+		return tabbedPaneInput.getSelectedIndex();
+	}
+	
+    public String getInputAddress() {
+    	return txtAddress.getText();
+    }
+    public String getInputCity() {
+    	return txtCitytown.getText();
+    }
+    public String getInputState() {
+    	return txtState.getText();
+    }
+    public String getInputZip() {
+    	return txtZip.getText();
+    }
+    public String getInputAreaZip() {
+    	return txtZip_1.getText();
     }
     
-    public void addStartTestListener(ActionListener start){
-    	startTestButton.addActionListener(start);
-    }
-    
-    public void addCancelListener(ActionListener cancel){
-		cancelButton.addActionListener(cancel);
-	}
-    
-    public void addRestartListener(ActionListener restart){
-		restartButton.addActionListener(restart);
-	}
-    
-    public void addRestartTestListener(ActionListener restartTest){
-		restartTestButton.addActionListener(restartTest);
-	}
     
     
-	public String getInputAddress(){
-		return textField.getText();
-	}
-	public String getInputCity(){
-		return textField_1.getText();
-	}
-	public String getInputState(){
-		return textField_2.getText();
-	}
-	public String getInputZip(){
-		return textField_3.getText();
-	}
-	
-	public void setOutputPredictPrice(String s){
-		textField_4.setText(s);
-	}
-	
-	public void setOutputLastSoldPrice(String s){
-		textField_5.setText(s);
-	}
-	
-	public void setOutputLastSoldDate(String s){
-		textField_6.setText(s);
-	}
-	
-	public void setOutputFloorSize(String s){
-		textField_7.setText(s);
-	}
-	
-	public void setOutputLotSize(String s){
-		textField_8.setText(s);
-	}
-	
-	public void setOutputBedroom(String s){
-		textField_9.setText(s);
-	}
-	
-	public void setOutputBathroom(String s){
-		textField_10.setText(s);
-	}
-	
-	public void setOutputYearBuilt(String s){
-		textField_11.setText(s);
-	}
-	
-	public void setStatusText(String s){
-		status.setText(s);
-	}
-	
-	public void setProgressBar(int progress){
-		processingProgressBar.setValue(progress);
-	}
-	
-	public void showInputCard(){
-		card.show(frame.getContentPane(), "input");
-	}
-	
-	public void showProcessingCard(){
-		card.show(frame.getContentPane(), "processing");
-	}
-	public void showResultCard(){
-		card.show(frame.getContentPane(), "result");
-	}
-	public void showTestResultCard(){
-		card.show(frame.getContentPane(), "testResult");
-	}
-	public boolean[] getVariableOptions() {
+	public boolean[] getVariableOption() {
 		boolean[] o = new boolean[6];
 		o[0] = chckbxFloorSize.isSelected();
 		o[1] = chckbxLotSize.isSelected();
-		o[2] = chckbxRegressionContainBase.isSelected();
-		o[3] = chckbxBedroom.isSelected();
-		o[4] = chckbxBathroom.isSelected();
-		o[5] = chckbxAge.isSelected();
+		o[2] = chckbxBedroomNumber.isSelected();
+		o[3] = chckbxBathroomNumber.isSelected();
+		o[4] = chckbxHouseAge.isSelected();
+		o[5] = chckbxUseBasePrice.isSelected();
 		return o;
 	}
-	public boolean[] getTestVariableOptions() {
+	
+	public boolean[] getTransferOption() {
 		boolean[] o = new boolean[6];
-		o[0] = checkBox.isSelected();
-		o[1] = checkBox_1.isSelected();
-		o[2] = checkBox_5.isSelected();
-		o[3] = checkBox_2.isSelected();
-		o[4] = checkBox_3.isSelected();
-		o[5] = checkBox_4.isSelected();
+		o[1] = chckbxTransferFloorSize.isSelected();
+		o[2] = chckbxTransferLotSize.isSelected();
 		return o;
+	}
+	
+	public JCheckBox getChckbxPrice() {
+		return chckbxPrice;
 	}
 	public JCheckBox getChckbxFloorSize() {
 		return chckbxFloorSize;
@@ -697,34 +594,56 @@ public class mainGui {
 	public JCheckBox getChckbxLotSize() {
 		return chckbxLotSize;
 	}
-	public JCheckBox getChckbxBedroom() {
-		return chckbxBedroom;
+	public JCheckBox getChckbxBedroomNumber() {
+		return chckbxBedroomNumber;
 	}
-	public JCheckBox getChckbxBathroom() {
-		return chckbxBathroom;
+	public JCheckBox getChckbxBathroomNumber() {
+		return chckbxBathroomNumber;
 	}
-	public JCheckBox getChckbxAge() {
-		return chckbxAge;
+	public JCheckBox getChckbxHouseAge() {
+		return chckbxHouseAge;
 	}
-	public JCheckBox getChckbxRegressionContainBase() {
-		return chckbxRegressionContainBase;
+	public JCheckBox getChckbxUseBasePrice() {
+		return chckbxUseBasePrice;
 	}
-	public JCheckBox getCheckBox() {
-		return checkBox;
+	public JCheckBox getChckbxTransferPrice() {
+		return chckbxTransferPrice;
 	}
-	public JCheckBox getCheckBox_1() {
-		return checkBox_1;
+	public JCheckBox getChckbxTransferFloorSize() {
+		return chckbxTransferFloorSize;
 	}
-	public JCheckBox getCheckBox_2() {
-		return checkBox_2;
+	public JCheckBox getChckbxTransferLotSize() {
+		return chckbxTransferLotSize;
 	}
-	public JCheckBox getCheckBox_3() {
-		return checkBox_3;
+	public int getSampleNumber() {
+		return (int)sampleNumberSpinner.getValue();
 	}
-	public JCheckBox getCheckBox_4() {
-		return checkBox_4;
+	public boolean[] getVariableOptions() {
+		boolean[] o = new boolean[6];
+		o[0] = chckbxFloorSize.isSelected();
+		o[1] = chckbxLotSize.isSelected();
+		o[2] = chckbxBedroomNumber.isSelected();
+		o[3] = chckbxBathroomNumber.isSelected();
+		o[4] = chckbxHouseAge.isSelected();
+		o[5] = chckbxUseBasePrice.isSelected();
+		return o;
 	}
-	public JCheckBox getCheckBox_5() {
-		return checkBox_5;
+
+	public JButton getBtnCancel() {
+		return btnCancel;
+	}
+	
+	public void setStatusText(String s){
+		processingStatus.setText(s);
+	}
+	public void setProgressBar(int progress){
+		processingProgressBar.setValue(progress);
+	}
+	
+	public JComboBox<String> getComboBoxMethod() {
+		return comboBoxMethod;
+	}
+	public int getComboBoxMethodIndex() {
+		return comboBoxMethod.getSelectedIndex();
 	}
 }

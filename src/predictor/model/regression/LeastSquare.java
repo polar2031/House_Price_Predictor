@@ -28,8 +28,6 @@ public class LeastSquare {
         RealMatrix tMatrix = new Array2DRowRealMatrix(test);
         RealMatrix p = tMatrix.multiply(solution);
         return p.getEntry(0, 0);
-//        double yLamda = p.getEntry(0, 0);
-//        return Math.pow(yLamda, 1.0 / lamda);
 	}
 	
 	public double[] solveAll(double[][] test){
@@ -59,7 +57,7 @@ public class LeastSquare {
 	public void showSolution(){
         // show solution
         double[][] o = solution.getData();
-        String value[] = {"base", "floor size", "lot size", "bedroom", "bathroom", "age", "summer", "fall", "winter"};
+        String value[] = {"floor size", "lot size", "base price", "bedroom", "bathroom", "age", "summer", "fall", "winter"};
         System.err.println("Variables");
         for(int i = 0; i < solution.getRowDimension(); i++){
             System.err.print(value[i] + ": ");

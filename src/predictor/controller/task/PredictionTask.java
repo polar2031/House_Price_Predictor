@@ -5,16 +5,17 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import predictor.controller.Common;
-import predictor.gui.mainGui;
+import predictor.gui.MainGui;
 import predictor.model.PredictionModel;
 import predictor.model.Sampler;
+import predictor.model.regression.PreProcessor;
 
 public class PredictionTask extends SwingWorker<Void, MessagePack> {
 	private PredictionModel m;
-	private mainGui g;
+	private MainGui g;
 	boolean workDone;
 	
-	public PredictionTask(mainGui g){
+	public PredictionTask(MainGui g){
 		super();
 		this.g = g;
 	}
@@ -24,7 +25,8 @@ public class PredictionTask extends SwingWorker<Void, MessagePack> {
 		m = new PredictionModel();
 		workDone = false;
 		int progress = 0;
-		//
+		
+		// find target house
 		publish(new MessagePack(progress, "Get Information of Target House"));
 		try{
 			m.setTarget(g.getInputAddress(), g.getInputCity(), g.getInputState(), g.getInputZip());
@@ -33,6 +35,7 @@ public class PredictionTask extends SwingWorker<Void, MessagePack> {
 			publish(new MessagePack(progress, "Connection Error"));
 			return null;
 		}
+		
 		if(m.isTargetSet() == false){
 			publish(new MessagePack(progress, "House Not Found on Zillow.com"));
 			return null;
@@ -41,44 +44,20 @@ public class PredictionTask extends SwingWorker<Void, MessagePack> {
 			return null;
 		}
 		
+		//find nearby houses
 		progress = 30;
+		publish(new MessagePack(progress, "Get Data of Nearby Houses"));
+		m.addSamples(Sampler.getDataOfZip(m.target.zip));
 		
-		//sample range (in miles)
-		double range = 1.0;
-		List<String> CoordinateList = Sampler.getSampleCoordinateList(m.target.latitude, m.target.longitude, range);
-		
-		for(int i = 0; !isCancelled() && i < CoordinateList.size(); i++){
-			int persentage = i * 100 / CoordinateList.size();
-			progress = 30 + 30 * persentage / 100;
-			publish(new MessagePack(progress, "Get Sample Houses: " + persentage + "%"));
-			
-			if(!Sampler.isDataOfCoordinateUp2Date(CoordinateList.get(i))){
-				publish(new MessagePack(progress, "Get Sample Houses: " + persentage + "%  Updating Data..."));
-				try{
-					Sampler.updateDataOfCoordinate(CoordinateList.get(i));
-				}
-				catch(Exception e){
-					e.printStackTrace();
-				}
-				if(isCancelled()){
-					return null;
-				}
-			}
-			try{
-				m.addSamples(Sampler.getDataOfCoordinate(CoordinateList.get(i)));
-			}
-			catch(Exception e){
-				e.printStackTrace();
-			}
-		}
-		
+		// start predicting
 		progress = 60;
 		publish(new MessagePack(progress, "Predicting"));
-		
 		try{
-			m.sampleFilter(200);
-			m.setVariable(g.getVariableOptions());
-            m.predict();
+			m.sampleFilter(g.getSampleNumber());
+			m.setVariable(Common.getVariableOptions(g));
+			m.setVariableTransfer(Common.getVariableTransferOptions(g));
+			m.setValueTransfer(Common.getValueTransferOptions(g));
+			m.predict(Common.getMethod(g));
 		}
 		catch(Exception e){
 			publish(new MessagePack(progress, "Oops, Something Went Wrong"));
@@ -96,19 +75,19 @@ public class PredictionTask extends SwingWorker<Void, MessagePack> {
     		g.showResultCard();
     		Common.showHouseInfo(m.target, g);
             Common.showSampleList(m.sampleList, g);
-            g.cancelButton.setEnabled(false);
-            g.startButton.setEnabled(true);
+//            g.cancelButton.setEnabled(false);
+//            g.startButton.setEnabled(true);
     	}
     	// task is cancelled
     	else if(isCancelled()){
-            g.cancelButton.setEnabled(false);
-            g.startButton.setEnabled(true);
+//            g.cancelButton.setEnabled(false);
+//            g.startButton.setEnabled(true);
             g.showInputCard();
     	}
     	// error occured
     	else{
-            g.cancelButton.setEnabled(false);
-            g.startButton.setEnabled(true);
+//            g.cancelButton.setEnabled(false);
+//            g.startButton.setEnabled(true);
             g.showInputCard();
     	}
     	workDone = false;

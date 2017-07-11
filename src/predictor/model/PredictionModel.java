@@ -8,19 +8,19 @@ import predictor.model.parser.ZillowParser;
 import predictor.model.regression.BoxCoxTransform;
 import predictor.model.regression.LeastSquare;
 import predictor.model.regression.PreProcessor;
-import predictor.model.regression.Variable;
+import predictor.model.VariableOption;
 
 public class PredictionModel {
 	public House target;
 	public List<House> sampleList;
-	private int variableNumber;
-	private Variable v;
+	private VariableOption v;
+	private boolean valueTransferFlag;
+	private double[] bestLamdaArray;
 	
 	public PredictionModel(){
 		target = null;
 		sampleList = new ArrayList<House>();
-		variableNumber = 2;
-		v = new Variable();
+		v = new VariableOption();
 	}
 	
     public void setTarget(String address, String city, String state, String zip) throws Exception {
@@ -28,129 +28,277 @@ public class PredictionModel {
     	return;
     }
     
-    public void setVariable(boolean[] variableOptions){
-    	variableNumber = 0;
-    	for(int i = 0; i < variableOptions.length; i++){
-    		if(variableOptions[i] == true){
-    			variableNumber += 1;
-    		}
-    	}
-    	v.setBasePriceFlag(variableOptions[2]);
-    	v.setBedroomNumberFlag(variableOptions[3]);
-    	v.setBathroomNumberFlag(variableOptions[4]);
-    	v.setAgeFlag(variableOptions[5]);
-
-    }
-    
     public boolean addSamples(List<House> newSampleList) {
     	if(newSampleList == null){
     		return false;
     	}
     	else{ 
-    		boolean repeat = false;
     		for(int i = 0; i < newSampleList.size();){
-    			//exclude target house
-    			if(newSampleList.get(i) == null){
-    				newSampleList.remove(i);
-    			}
-    			if(newSampleList.get(i).address.compareTo(target.address) == 0){
-    				newSampleList.remove(i);
-    				continue;
-    			}
-    			//exclude same house
-    			for(int j = 0; j < sampleList.size(); j++){
-    				if(newSampleList.get(i).address.compareTo(sampleList.get(j).address) == 0){
-    					newSampleList.remove(i);
-    					repeat = true;
-    					break;
-    				}
-    			}
-    			if(!repeat){
+    			if(newSampleList.get(i).address.compareTo(target.address) != 0){
     				sampleList.add(newSampleList.get(i));
-    				i++;
     			}
-    			else{
-    				repeat = false;
-    			}
+    			i++;
     		}
     		return true;
     	}
 	}
    
    	public void sampleFilter(int maxSampleNumber){
-    	sampleList = PreProcessor.floorSizeFilter(sampleList, target, 0.2, maxSampleNumber);
-    	System.err.println("sample number");
-        System.err.println(sampleList.size());
+   		sampleList = PreProcessor.basicFilter(sampleList);
+   		sampleList = PreProcessor.soldTimeFilter(sampleList, 360);
+   		sampleList = PreProcessor.pricePerSqftFilter(sampleList);
+    	sampleList = PreProcessor.floorSizeFilter(sampleList, target, 0.5, maxSampleNumber);
+
+        System.err.println("sample number: " + sampleList.size());
     }
     
+    public void setVariable(boolean[] variableOptions){
+    	v.setFloorSizeFlag(variableOptions[VariableOption.floorSize]);
+    	v.setLotSizeFlag(variableOptions[VariableOption.lotSize]);
+    	v.setBedroomNumberFlag(variableOptions[VariableOption.bedroomNumber]);
+    	v.setBathroomNumberFlag(variableOptions[VariableOption.bathroomNumber]);
+    	v.setAgeFlag(variableOptions[VariableOption.age]);
+    	v.setBasePriceFlag(variableOptions[VariableOption.basePrice]);
+    }
+   	
+    public void setVariableTransfer(boolean[] transferOptions){
+    	v.setTransferFlag(transferOptions);
+    }
+    public void setValueTransfer(boolean b){
+    	valueTransferFlag = b;
+    }
     
-   	public void predict() throws Exception{
+   	public void predict(int method) throws Exception{
     	
-    	double[][] sampleVariable = new double[sampleList.size()][variableNumber];
-    	double[] sampleSolution = new double[sampleList.size()];
-    	double[][] targetVariable  = new double[1][variableNumber];
-
-    	for(int i = 0; i < sampleList.size(); i++){
-    		sampleVariable[i] = v.variableTransform(sampleList.get(i));
-    		sampleSolution[i] = sampleList.get(i).lastSoldPrice;
+   		// check
+    	if(sampleList.size() == 0){
+    		target.predictPrice = 0.0;
+    		return;
     	}
-    	targetVariable[0] = v.variableTransform(target);
+   		
+
     	
-    	//find best lamda
-    	double lamda = -1.0;
-    	double bestLamda =  -1.0;
-    	double theta = -1.0;
-    	double bestTheta = -1.0;
-    	double theta1 = -1.0;
-    	double bestTheta1 = -1.0;
-    	double minRss = Double.MAX_VALUE;
-    	LeastSquare bestL = new LeastSquare(sampleVariable, sampleSolution);
+    	if(method == 0){
+    		// price per sqft
+    		double totalFloorSize = 0.0;
+    		double totalPrice = 0.0;
+    		double pricePerSqft;
+        	for(int i = 0; i < sampleList.size(); i++){
+        		totalFloorSize += sampleList.get(i).floorSize;
+        		totalPrice += sampleList.get(i).lastSoldPrice;
+        	}
+        	pricePerSqft = totalPrice / totalFloorSize;
+        	target.predictPrice = pricePerSqft * target.floorSize;
+        	System.err.println(target.predictPrice);
+    	}
     	
-    	for(lamda = 1.0; lamda < 1.001; lamda += 0.1){
-    		double[] sampleSolutionT = BoxCoxTransform.transform(sampleSolution, lamda); 
-    		for(theta = 1.0; theta < 1.001; theta += 0.1){
-    			double[][] sampleVariableT = BoxCoxTransform.transform(sampleVariable, theta, 0);
-    			for(theta1 = 1.0; theta1 < 1.001; theta1 += 0.1){
-    				sampleVariableT = BoxCoxTransform.transform(sampleVariableT, theta1, 1);
-    				LeastSquare l = new LeastSquare(sampleVariableT, sampleSolutionT);
-    				double resultT[] = l.solveAll(sampleVariableT);
-    				double result[] = BoxCoxTransform.reduce(resultT, lamda);
-    				double rss = 0.0;
-    				for(int i = 0; i < sampleList.size(); i++){
-    					rss += Math.abs(result[i] - sampleSolution[i]);
+    	else{
+    		// regression
+    		double[][] sampleVariable = new double[sampleList.size()][v.variableNumber()];
+        	double[] sampleSolution = new double[sampleList.size()];
+        	double[][] targetVariable  = new double[1][v.variableNumber()];
+        	
+        	// build sample matrix
+        	for(int i = 0; i < sampleList.size(); i++){
+        		sampleVariable[i] = v.variableTransform(sampleList.get(i));
+        		sampleSolution[i] = sampleList.get(i).lastSoldPrice;
+        	}
+        	targetVariable[0] = v.variableTransform(target);
+        	
+    		LeastSquare bestL;
+    		if(method != 5){
+    			// Linear
+    			if(method == 1){
+    				bestL = new LeastSquare(sampleVariable, sampleSolution);
+    				target.predictPrice = bestL.solve(targetVariable);
+    	        	System.err.println(target.predictPrice);
+
+    			}
+    			// log-Linear
+    			else if(method == 2){
+    				double[] sampleSolutionT = new double[sampleList.size()];
+    				for(int i = 0; i < sampleSolution.length; i++){
+    					sampleSolutionT[i] = Math.log(sampleSolution[i]);
     				}
-    				if(minRss > rss){
-    					minRss = rss;
-    					bestLamda = lamda;
-    					bestTheta = theta;
-    					bestTheta1 = theta1;
-    					bestL = l;
+    				bestL = new LeastSquare(sampleVariable, sampleSolutionT);
+    				target.predictPrice = Math.pow(Math.E, bestL.solve(targetVariable));
+    	        	System.err.println(target.predictPrice);
+    			}
+    			// linear-log
+    			else if(method == 3){
+    				double[][] sampleVariableT= new double[sampleList.size()][v.variableNumber()];
+    				double[][] targetVariableT  = new double[1][v.variableNumber()];
+    				// for all used/unused variable
+    				int index = 0;
+    				for(int i = 0; i < v.variableFlag.length; i++){
+    					// if variable is used
+    					if(v.variableFlag[i] == true){
+    						// if variable need transfer
+    						if(v.variableTransferFlag[i] == true){
+    							// transfer that kind of variable in samples
+    							for(int j = 0; j < sampleList.size(); j++){
+    								sampleVariableT[j][index] = Math.log(sampleVariable[j][index]);
+    							}
+    							// transfer that kind of variable in target
+    							targetVariableT[0][index] = Math.log(targetVariable[0][index]);
+    						}
+    						// else don't transfer
+    						else{
+    							for(int j = 0; j < sampleList.size(); j++){
+    								sampleVariableT[j][index] = sampleVariable[j][index];
+    							}
+    							targetVariableT[0][index] = targetVariable[0][index];
+    						}
+    						index++;
+    					}
     				}
-//    				System.err.println(result[0]);
-    				if(Double.isNaN(result[0])){
-//    					System.err.println("NaN");
+    				
+    				bestL = new LeastSquare(sampleVariableT, sampleSolution);
+    				target.predictPrice = bestL.solve(targetVariableT);
+    	        	System.err.println(target.predictPrice);
+    			}
+    			// log-log
+    			else if(method == 4){
+    				double[] sampleSolutionT = new double[sampleList.size()];
+    				double[][] sampleVariableT= new double[sampleList.size()][v.variableNumber()];
+    				double[][] targetVariableT  = new double[1][v.variableNumber()];
+    				
+    				for(int i = 0; i < sampleSolution.length; i++){
+    					sampleSolutionT[i] = Math.log(sampleSolution[i]);
     				}
+    				
+    				// for all used/unused variable
+    				int index = 0;
+    				for(int i = 0; i < v.variableFlag.length; i++){
+    					// if variable is used
+    					if(v.variableFlag[i] == true){
+    						// if variable need transfer
+    						if(v.variableTransferFlag[i] == true){
+    							// transfer that kind of variable in samples
+    							for(int j = 0; j < sampleList.size(); j++){
+    								sampleVariableT[j][index] = Math.log(sampleVariable[j][index]);
+    							}
+    							// transfer that kind of variable in target
+    							targetVariableT[0][index] = Math.log(targetVariable[0][index]);
+    						}
+    						// else don't transfer
+    						else{
+    							for(int j = 0; j < sampleList.size(); j++){
+    								sampleVariableT[j][index] = sampleVariable[j][index];
+    							}
+    							targetVariableT[0][index] = targetVariable[0][index];
+    						}
+    						index++;
+    					}
+    				}
+    				
+    				bestL = new LeastSquare(sampleVariableT, sampleSolutionT);
+    				target.predictPrice = Math.pow(Math.E, bestL.solve(targetVariableT));
+    	        	System.err.println(target.predictPrice);
     			}
     		}
+    		// box-cox transfer
+    		if(method == 5){
+    			
+    			v.setUsedVariableTransferFlag();
+    			
+				double[] sampleSolutionT = new double[sampleList.size()];
+				double[][] sampleVariableT= new double[sampleList.size()][v.variableNumber()];
+				double[][] targetVariableT  = new double[1][v.variableNumber()];
+				
+		    	double lamda;
+		    	double maxLamda;
+		    	double bestLamda;
+		    	
+		    	double theta;
+		    	double maxTheta;
+		    	double bestTheta;
+		    	
+		    	double theta1;
+		    	double maxTheta1;
+		    	double bestTheta1;
+		    	
+		    	double minRss = Double.MAX_VALUE;
+		    	bestL = new LeastSquare(sampleVariable, sampleSolution);
+		    	
+		    	if(valueTransferFlag == true){
+		    		lamda = -1.0;
+		    		maxLamda = 2.001;
+		    	}
+		    	else{
+		    		lamda = 1.0;
+		    		maxLamda = 1.001;
+		    	}
+		    	bestLamda = lamda;
+		    	if(v.variableTransferFlag[0] == true){
+		    		theta = -1.0;
+		    		maxTheta = 2.001;
+		    	}
+		    	else{
+		    		theta = 1.0;
+		    		maxTheta = 1.001;
+		    	}
+		    	bestTheta = theta;
+		    	if(v.variableTransferFlag[1] == true){
+		    		theta1 = -1.0;
+		    		maxTheta1 = 2.001;
+		    	}
+		    	else{
+		    		theta1 = 1.0;
+		    		maxTheta1 = 1.001;
+		    	}
+		    	bestTheta1 = theta1;
+		    	
+		    	for(; lamda < maxLamda; lamda += 0.1){
+		    		sampleSolutionT = BoxCoxTransform.transformAll(sampleSolution, lamda); 
+		    		for(; theta < maxTheta; theta += 0.1){
+		    			sampleVariableT = BoxCoxTransform.transform(sampleVariable, theta, 0);
+		    			for(; theta1 < maxTheta1; theta1 += 0.1){
+		    				sampleVariableT = BoxCoxTransform.transform(sampleVariableT, theta1, 1);
+		    				LeastSquare l = new LeastSquare(sampleVariableT, sampleSolutionT);
+		    				double resultT[] = l.solveAll(sampleVariableT);
+		    				double result[] = BoxCoxTransform.reduce(resultT, lamda);
+		    				double rss = 0.0;
+		    				for(int i = 0; i < sampleList.size(); i++){
+		    					rss += Math.abs(result[i] - sampleSolution[i]);
+		    				}
+		    				if(minRss > rss){
+		    					minRss = rss;
+		    					bestLamda = lamda;
+		    					bestTheta = theta;
+		    					bestTheta1 = theta1;
+		    					bestL = l;
+		    				}
+		    				if(Double.isNaN(result[0])){
+		    					System.err.println("NaN");
+		    				}
+		    			}
+		    		}
+		    	}
+		    	
+		    	targetVariableT = BoxCoxTransform.transform(targetVariable, bestTheta, 0);
+		    	targetVariableT = BoxCoxTransform.transform(targetVariableT, bestTheta1, 1);
+		    	double predictPriceT = bestL.solve(targetVariableT);
+		    	double predictPrice = Math.pow(predictPriceT, 1.0 / bestLamda);
+		    	target.predictPrice = predictPrice;
+	        	System.err.println(target.predictPrice);
+    		}
     	}
-    	
-    	double[][] targetVariableT = BoxCoxTransform.transform(targetVariable, bestTheta, 0);
-    	targetVariableT = BoxCoxTransform.transform(targetVariableT, bestTheta1, 1);
-    	double predictPriceT = bestL.solve(targetVariableT);
-    	double predictPrice = Math.pow(predictPriceT, 1.0 / bestLamda);
-    	target.predictPrice = predictPrice;
-    	
-    	System.err.println("predictPrice");
-    	System.err.println(predictPrice);
-    	System.err.println("bestLamda");
-    	System.err.println(bestLamda);
-    	System.err.println("bestTheta");
-    	System.err.println(bestTheta);
-    	System.err.println("bestTheta1");
-    	System.err.println(bestTheta1);
-    	bestL.showSolution();
-    }
 
+    	
+//    	System.err.println("predictPrice");
+//    	System.err.println(predictPrice);
+//    	System.err.println("bestLamda");
+//    	System.err.println(bestLamda);
+//    	System.err.println("bestTheta");
+//    	System.err.println(bestTheta);
+//    	System.err.println("bestTheta1");
+//    	System.err.println(bestTheta1);
+//    	bestL.showSolution();
+    }
+   	
+   	
+   	
 	public boolean isTargetSet() {
 		if(target != null){
 			return true;

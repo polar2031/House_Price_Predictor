@@ -1,6 +1,7 @@
 package predictor.controller.listener;
 
 import predictor.controller.Controller;
+import predictor.controller.task.AreaPredictionTask;
 import predictor.controller.task.PredictionTask;
 
 import java.awt.event.ActionEvent;
@@ -16,11 +17,14 @@ public class StartListener implements ActionListener {
 	
 	@Override
     public void actionPerformed(ActionEvent event) {
-        c.g.startButton.setEnabled(false);
         c.g.showProcessingCard();
-        c.task = new PredictionTask(c.g);
-        c.task.execute();
-        c.g.cancelButton.setEnabled(true);
+        if(c.g.getSelectedMode() == 0){
+        	c.task = new PredictionTask(c.g);
+        	c.task.execute();
+        }
+        else if(c.g.getSelectedMode() == 1){
+        	c.task = new AreaPredictionTask(c.g);
+        	c.task.execute();
+        }
     }
-
 }

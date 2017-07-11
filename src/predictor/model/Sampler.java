@@ -117,4 +117,57 @@ public class Sampler {
 	public static double longitudeReduction(int transferedLongitude){
 		return (double)(transferedLongitude - 18000) / 100;
 	}
+
+	public static List<House> getDataOfZip(String zip) throws Exception {
+    	List<House> sampleList;
+    	File areaData = new File("data" + File.separator + zip + ".dat");
+	    Area a;
+    	if(areaData.exists()){
+	    	FileInputStream fis = new FileInputStream("data" + File.separator + zip + ".dat");
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			a = (Area)ois.readObject();
+			ois.close();
+	    }
+    	else{
+    		return null;
+    	}
+	    
+	    sampleList = new ArrayList<House>(a.HouseList);
+
+    	for(int i = 0; i < a.HouseList.size(); i++){
+            sampleList.add(a.HouseList.get(i));
+        }
+    	
+    	return sampleList;
+	}
+	
+	public static boolean isDataOfZipUp2Date(String zip) {
+		File areaData = new File("data" + File.separator + zip + ".dat");
+		// 30 days in milliseconds = 2592000000
+		if(areaData.exists() && (areaData.lastModified() > (System.currentTimeMillis() - (2592000000L)))){
+	    	return true;
+	    }
+	    else{
+	    	return false;
+	    }
+	}
+	
+	public static boolean updateDataOfzip(String zip) {
+		try{
+	    	File areaData = new File("data" + File.separator + zip + ".dat");
+		    FileUtils.forceMkdirParent(areaData);
+		    Area a;
+	    	List<House> temp = ZillowParser.parseZip(zip);
+	    	a = new Area(temp);
+	    	FileOutputStream fos = new FileOutputStream("data" + File.separator + zip + ".dat");
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(a);
+			oos.close();
+			return true;
+		}
+		catch(Exception e){
+			return false;
+		}
+		
+	}
 }

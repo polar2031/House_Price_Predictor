@@ -1,12 +1,13 @@
 package predictor.model.regression;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import predictor.model.data.House;
 
 public class PreProcessor {
-	public static int variableNumber = 6;
 	
 	// take at most maxSampleNumber samples with similarity on floor size more than minSimilarity
 	public static List<House> floorSizeFilter(List<House> sampleList, House target, double minSimilarity, int maxSampleNumber){
@@ -45,7 +46,6 @@ public class PreProcessor {
 	}
 	
 	public static List<House> rangeFilter(List<House> sampleList, House target, double maxRange, int maxSampleNumber){
-		List<House> newSampleList = new ArrayList<House>();
 		
 		double EARTH_RADIUS = 3963.1906;
         double milesPerlatitude = EARTH_RADIUS * Math.PI / 180.0;
@@ -64,24 +64,51 @@ public class PreProcessor {
         		i++;
         	}
         }
-		return newSampleList;
+		return sampleList;
 	}
-//	
-//	public static double[] variableTransform(House target) {
-//		int thisYear = 2017;
-//        double[] a = new double[variableNumber];
-//    	a[0] = 0;
-//        a[1] = target.floorSize;
-//        a[2] = target.lotSize;
-//        a[3] = target.bedroomNumber;
-//        a[3] = 0;
-//        a[4] = target.bathroomNumber;
-//        a[4] = 0;
-//        a[5] = (double)(- thisYear + target.builtYear);
-////        a[5] = 0;
-//
-//		return a;
-//	}
 	
+	public static List<House> soldTimeFilter(List<House> sampleList, int expireDays){
+
+        for(int i = 0; i < sampleList.size();){
+        	Calendar dateNow = Calendar.getInstance();
+        	Calendar dateSold = Calendar.getInstance();
+        	dateSold.setTime(sampleList.get(i).lastSoldDate);
+        	long days = ChronoUnit.DAYS.between(dateSold.toInstant(), dateNow.toInstant());
+        	if(days > expireDays){
+        		sampleList.remove(i);
+        	}
+        	else{
+        		i++;
+        	}
+        }
+		return sampleList;
+	}
+	
+	public static List<House> basicFilter(List<House> sampleList){
+        for(int i = 0; i < sampleList.size();){
+        	if(sampleList.get(i).lastSoldPrice == null || sampleList.get(i).lastSoldDate == null){
+        		sampleList.remove(i);
+        	}
+        	else{
+        		i++;
+        	}
+        }
+		return sampleList;
+	}
+	
+	public static List<House> pricePerSqftFilter(List<House> sampleList){
+		double avgPricePerSqft = 0;
+        for(int i = 0; i < sampleList.size(); i++){
+        	avgPricePerSqft += sampleList.get(i).lastSoldPrice / sampleList.get(i).floorSize; 
+        }
+        avgPricePerSqft = avgPricePerSqft / sampleList.size();
+        for(int i = 0; i < sampleList.size(); i++){
+        	double pricePerSqft = sampleList.get(i).lastSoldPrice / sampleList.get(i).floorSize; 
+        	if(Math.abs((avgPricePerSqft - pricePerSqft) / avgPricePerSqft) > 0.3){
+        		sampleList.remove(i);
+        	}
+        }
+		return sampleList;
+	}
 
 }

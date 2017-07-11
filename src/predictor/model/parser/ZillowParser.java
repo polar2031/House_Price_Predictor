@@ -15,12 +15,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import predictor.model.data.House;
 
 public class ZillowParser {
-	
 
-//        // 42.135515 - 42.106676 = 0.028839 -> +-0.0144
-//        // -71.154907 - -71.193874 = 0.038967 -> +-0.0195
-
-	
 	// Return an ArrayList of Houses in the input area
 	// IOException, FailingHttpStatusCodeException, MalformedURLException
     public static ArrayList<House> parseArea(Double latitude, Double longitude, Double latitudeRange, Double longitudeRange) throws Exception {
@@ -102,6 +97,81 @@ public class ZillowParser {
         return houses;
     }
 	
+	// Return an ArrayList of Houses in the input zip area
+	// IOException, FailingHttpStatusCodeException, MalformedURLException
+    public static ArrayList<House> parseZip(String zip) throws Exception {
+        // https://www.zillow.com/homes/recently_sold/02125_rb/house,apartment_duplex,townhouse_type/
+    	
+        ArrayList<House> houses = new ArrayList<House>();
+
+        // make URL of target area
+        String leftUrl = "https://www.zillow.com/homes/recently_sold/";
+        String middleUrl = zip;
+        String rightUrl = "_rb/house,apartment_duplex,townhouse_type/";
+
+        int parsePages = 1;
+
+        for(int i = 1; i <= parsePages; i++){
+            String url = leftUrl + middleUrl + rightUrl + i + "_p";
+            System.err.println("get list of nearby houses from: "+ url);
+            Document udoc;
+            Elements urlElements;
+            
+            
+        	WebClient wc = new WebClient();
+            wc.getOptions().setJavaScriptEnabled(true);
+            wc.getOptions().setCssEnabled(false);
+            wc.getOptions().setThrowExceptionOnScriptError(false);
+            wc.getOptions().setTimeout(10000);
+            
+            try{
+	            HtmlPage page = wc.getPage(url);
+	            int errorCount = 0;
+	            while(true){
+	                udoc = Jsoup.parse(page.asXml(), "http://www.zillow.com");
+	                urlElements = udoc.select("a[class=\"zsg-photo-card-overlay-link routable hdp-link routable mask hdp-link\"]");
+	                if(urlElements.isEmpty() && errorCount++ < 200){
+	                		Thread.sleep(200);
+	                }
+	                else{
+	                    break;
+	                }
+	            }
+            }
+            finally{
+            	wc.close();
+            }
+
+            // get page number
+            if(i == 1){
+                Elements pageSelectElements = udoc.select("ol[class=\"zsg-pagination\"]").select("li");
+                if(!pageSelectElements.isEmpty() && pageSelectElements.size() > 1){
+                    parsePages = Integer.parseInt(pageSelectElements.get(pageSelectElements.size() - 2).text());
+                }
+            }
+
+
+            for(Element u : urlElements){
+                String houseUrl = u.attr("abs:href");
+                // System.err.println(houseUrl);
+                House tempHouse;
+                try{
+                	tempHouse = parseHouseDetailPage(houseUrl);
+                }
+                catch(Exception e){
+                	//error occur while parsing 
+                	//abandon parsing
+                	tempHouse = null;
+                }
+                if(tempHouse != null){
+            		houses.add(tempHouse);
+            	}
+            }
+        }
+        return houses;
+    }
+    
+    
 	public static House parseHouseThrowAddress(String address, String state, String zip) throws Exception{
         // http://www.zillow.com/homes/18-Sandy-Ridge-Cir-Sharon-MA-02067_rb/
         String leftUrl = "http://www.zillow.com/homes/";
