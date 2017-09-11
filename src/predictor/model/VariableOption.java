@@ -4,14 +4,19 @@ import java.util.Calendar;
 import predictor.model.data.House;
 
 public class VariableOption {
-	public static final int floorSize = 0;
-	public static final int lotSize = 1;
-	public static final int bedroomNumber = 2;
-	public static final int bathroomNumber = 3;
-	public static final int age = 4;
-	public static final int basePrice = 5;
-	public static final int maxVariable = 6;
-	public static final String[] variableName = {"Floor Size", "Lot Size", "Bedroom Number", "Bathroom Number", "Age"};
+	public static final int basePrice = 0;
+	public static final int floorSize = 1;
+	public static final int lotSize = 2;
+	public static final int bedroomNumber = 3;
+	public static final int bathroomNumber = 4;
+	public static final int age = 5;
+	public static final int maxVariable = 8;
+	public static final String[] variableName = {
+			"Base Price", 
+			"Floor Size", 
+			"Lot Size", 
+			"Bedroom Number", 
+			"Bathroom Number"};
 	
 	boolean[] variableFlag;
 	boolean[] variableTransferFlag;
@@ -29,7 +34,9 @@ public class VariableOption {
 			variableTransferFlag[i] = false;
 		}
 	}
-	
+	public void setBasePriceFlag(boolean b){
+		variableFlag[basePrice] = b;
+	}
 	public void setFloorSizeFlag(boolean b){
 		variableFlag[floorSize] = b;
 	}
@@ -45,9 +52,7 @@ public class VariableOption {
 	public void setAgeFlag(boolean b){
 		variableFlag[age] = b;
 	}
-	public void setBasePriceFlag(boolean b){
-		variableFlag[basePrice] = b;
-	}
+
 	
 	public void setTransferFlag(boolean[] bArray){
 		for(int i = 0; i < variableTransferFlag.length; i++){
@@ -70,6 +75,9 @@ public class VariableOption {
 		usedVariableLamda = new double[variableNumber()];
 
 		int v = 0;
+        if(variableFlag[basePrice]){
+        	usedVariableTransferFlag[v++] = variableTransferFlag[basePrice];
+        }
         if(variableFlag[floorSize]){
         	usedVariableTransferFlag[v++] = variableTransferFlag[floorSize];
         }
@@ -86,19 +94,19 @@ public class VariableOption {
         if(variableFlag[age]){
         	usedVariableTransferFlag[v++] = variableTransferFlag[age];
         }
-        if(variableFlag[basePrice]){
-        	usedVariableTransferFlag[v++] = variableTransferFlag[basePrice];
-        }
-        
+
         return;
 	}
 	
 	
 	public double[] variableTransform(House target) {
 		int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-        double[] a = new double[variableNumber()];
+        double[] a = new double[variableNumber() + 2];
         int v = 0;
-
+        
+        if(variableFlag[basePrice]){
+        	a[v++] = 1;
+        }
         if(variableFlag[floorSize]){
         	a[v++] = target.floorSize;
         }
@@ -112,11 +120,23 @@ public class VariableOption {
         if(variableFlag[bathroomNumber]){
         	a[v++] = target.bathroomNumber;
         }
+        a[v++] = target.bathroomNumber / target.bedroomNumber;
+        a[v++] = target.floorSize / target.bedroomNumber;
         if(variableFlag[age]){
-        	a[v++] = (double)(- thisYear + target.builtYear);
-        }
-        if(variableFlag[basePrice]){
-        	a[v++] = 1;
+//        	a[v++] = (double)(thisYear - target.builtYear);
+        	if(thisYear - target.builtYear + 1 > 0){
+        		a[v++] = Math.log((double)(thisYear - target.builtYear + 1));
+        	}
+        	else{
+        		a[v++] = Math.log(50);
+        	}
+//        	a[v++] = -Math.pow((double)(thisYear - target.builtYear), 2);
+//        	if((54 - (thisYear - target.builtYear)) >= 0){
+//        		a[v++] = Math.pow((double)(54 - (thisYear - target.builtYear)), 5);
+//        	}
+//        	else{
+//        		a[v++] = -Math.pow((double)(- 54 + (thisYear - target.builtYear)), 5);
+//        	}
         }
 
 		return a;

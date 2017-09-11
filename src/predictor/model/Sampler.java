@@ -85,10 +85,6 @@ public class Sampler {
     	}
 	    
 	    sampleList = new ArrayList<House>(a.HouseList);
-
-    	for(int i = 0; i < a.HouseList.size(); i++){
-            sampleList.add(a.HouseList.get(i));
-        }
     	
     	return sampleList;
     }
@@ -133,10 +129,6 @@ public class Sampler {
     	}
 	    
 	    sampleList = new ArrayList<House>(a.HouseList);
-
-    	for(int i = 0; i < a.HouseList.size(); i++){
-            sampleList.add(a.HouseList.get(i));
-        }
     	
     	return sampleList;
 	}
@@ -144,7 +136,7 @@ public class Sampler {
 	public static boolean isDataOfZipUp2Date(String zip) {
 		File areaData = new File("data" + File.separator + zip + ".dat");
 		// 30 days in milliseconds = 2592000000
-		if(areaData.exists() && (areaData.lastModified() > (System.currentTimeMillis() - (2592000000L)))){
+		if(areaData.exists() && (areaData.lastModified() > (System.currentTimeMillis() - (51840000000L)))){
 	    	return true;
 	    }
 	    else{
@@ -158,6 +150,7 @@ public class Sampler {
 		    FileUtils.forceMkdirParent(areaData);
 		    Area a;
 	    	List<House> temp = ZillowParser.parseZip(zip);
+	    	System.err.println(temp.size());
 	    	a = new Area(temp);
 	    	FileOutputStream fos = new FileOutputStream("data" + File.separator + zip + ".dat");
 			ObjectOutputStream oos = new ObjectOutputStream(fos);

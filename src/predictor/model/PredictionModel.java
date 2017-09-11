@@ -15,7 +15,7 @@ public class PredictionModel {
 	public List<House> sampleList;
 	private VariableOption v;
 	private boolean valueTransferFlag;
-	private double[] bestLamdaArray;
+	private int sampleNumber;
 	
 	public PredictionModel(){
 		target = null;
@@ -43,13 +43,36 @@ public class PredictionModel {
     	}
 	}
    
-   	public void sampleFilter(int maxSampleNumber){
+   	public void sampleFilter(){
+   		
    		sampleList = PreProcessor.basicFilter(sampleList);
-   		sampleList = PreProcessor.soldTimeFilter(sampleList, 360);
+//   		sampleList = PreProcessor.soldTimeFilter(sampleList, 365);
    		sampleList = PreProcessor.pricePerSqftFilter(sampleList);
-    	sampleList = PreProcessor.floorSizeFilter(sampleList, target, 0.5, maxSampleNumber);
+//   		sampleList = PreProcessor.priceFilter(sampleList, target.floorSize);
 
-        System.err.println("sample number: " + sampleList.size());
+   		
+   		// take 3 closet houses
+   		double range = 0.01;
+   		double maxRange = 1;
+   		while(true){
+   			if(range > maxRange){
+   				break; 
+   			}
+   			List<House> t = PreProcessor.rangeFilter(sampleList, target, range, sampleNumber);
+   			if(t.size() < sampleNumber){
+   				range += 0.01;
+   			}
+   			else{
+   				sampleList = t;
+   				break;
+   			}
+
+   		}
+
+   		
+//    	sampleList = PreProcessor.floorSizeFilter(sampleList, target, 0.1, maxSampleNumber);
+
+//        System.err.println("sample number: " + sampleList.size());
     }
     
     public void setVariable(boolean[] variableOptions){
@@ -70,26 +93,18 @@ public class PredictionModel {
     
    	public void predict(int method) throws Exception{
     	
+//   		System.err.println(sampleList.size());
+   		
    		// check
     	if(sampleList.size() == 0){
     		target.predictPrice = 0.0;
     		return;
     	}
    		
-
-    	
     	if(method == 0){
-    		// price per sqft
-    		double totalFloorSize = 0.0;
-    		double totalPrice = 0.0;
-    		double pricePerSqft;
-        	for(int i = 0; i < sampleList.size(); i++){
-        		totalFloorSize += sampleList.get(i).floorSize;
-        		totalPrice += sampleList.get(i).lastSoldPrice;
-        	}
-        	pricePerSqft = totalPrice / totalFloorSize;
-        	target.predictPrice = pricePerSqft * target.floorSize;
-        	System.err.println(target.predictPrice);
+    		// take n similar houses
+    		
+
     	}
     	
     	else{
@@ -111,7 +126,7 @@ public class PredictionModel {
     			if(method == 1){
     				bestL = new LeastSquare(sampleVariable, sampleSolution);
     				target.predictPrice = bestL.solve(targetVariable);
-    	        	System.err.println(target.predictPrice);
+//    	        	System.err.println(target.lastSoldPrice + "," + target.predictPrice + "," + target.address);
 
     			}
     			// log-Linear
@@ -119,10 +134,14 @@ public class PredictionModel {
     				double[] sampleSolutionT = new double[sampleList.size()];
     				for(int i = 0; i < sampleSolution.length; i++){
     					sampleSolutionT[i] = Math.log(sampleSolution[i]);
+//    					System.err.println(sampleSolution[i] + "," + sampleSolutionT[i]);
+//    					System.err.println(Math.pow(Math.E, sampleSolutionT[i]));
     				}
     				bestL = new LeastSquare(sampleVariable, sampleSolutionT);
     				target.predictPrice = Math.pow(Math.E, bestL.solve(targetVariable));
-    	        	System.err.println(target.predictPrice);
+//    				System.err.println(bestL.solve(targetVariable));
+//    	        	System.err.println(target.lastSoldPrice + "," + target.predictPrice);
+//    				System.err.println(Math.pow(Math.E, Math.log(100)));
     			}
     			// linear-log
     			else if(method == 3){
@@ -155,7 +174,7 @@ public class PredictionModel {
     				
     				bestL = new LeastSquare(sampleVariableT, sampleSolution);
     				target.predictPrice = bestL.solve(targetVariableT);
-    	        	System.err.println(target.predictPrice);
+//    	        	System.err.println(target.lastSoldPrice + "," + target.predictPrice + "," + target.address);
     			}
     			// log-log
     			else if(method == 4){
@@ -194,7 +213,7 @@ public class PredictionModel {
     				
     				bestL = new LeastSquare(sampleVariableT, sampleSolutionT);
     				target.predictPrice = Math.pow(Math.E, bestL.solve(targetVariableT));
-    	        	System.err.println(target.predictPrice);
+//    	        	System.err.println(target.lastSoldPrice + "," + target.predictPrice + "," + target.address);
     			}
     		}
     		// box-cox transfer
@@ -281,19 +300,10 @@ public class PredictionModel {
 		    	double predictPriceT = bestL.solve(targetVariableT);
 		    	double predictPrice = Math.pow(predictPriceT, 1.0 / bestLamda);
 		    	target.predictPrice = predictPrice;
-	        	System.err.println(target.predictPrice);
+//	        	System.err.println(target.lastSoldPrice + "," + target.predictPrice + "," + target.address);
     		}
     	}
 
-    	
-//    	System.err.println("predictPrice");
-//    	System.err.println(predictPrice);
-//    	System.err.println("bestLamda");
-//    	System.err.println(bestLamda);
-//    	System.err.println("bestTheta");
-//    	System.err.println(bestTheta);
-//    	System.err.println("bestTheta1");
-//    	System.err.println(bestTheta1);
 //    	bestL.showSolution();
     }
    	
@@ -304,6 +314,16 @@ public class PredictionModel {
 			return true;
 		}
 		return false;
+	}
+
+	public void setTarget(House h) {
+		target = h;
+		return;
+	}
+
+	public void setSampleNumber(int sampleNumber) {
+		this.sampleNumber = sampleNumber;
+		return;
 	}
 
 }

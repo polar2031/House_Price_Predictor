@@ -8,7 +8,6 @@ import predictor.controller.Common;
 import predictor.gui.MainGui;
 import predictor.model.PredictionModel;
 import predictor.model.Sampler;
-import predictor.model.regression.PreProcessor;
 
 public class PredictionTask extends SwingWorker<Void, MessagePack> {
 	private PredictionModel m;
@@ -53,7 +52,7 @@ public class PredictionTask extends SwingWorker<Void, MessagePack> {
 		progress = 60;
 		publish(new MessagePack(progress, "Predicting"));
 		try{
-			m.sampleFilter(g.getSampleNumber());
+			m.setSampleNumber(g.getSampleNumber());
 			m.setVariable(Common.getVariableOptions(g));
 			m.setVariableTransfer(Common.getVariableTransferOptions(g));
 			m.setValueTransfer(Common.getValueTransferOptions(g));

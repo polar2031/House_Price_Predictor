@@ -7,149 +7,125 @@ import javax.swing.SwingWorker;
 import predictor.controller.Common;
 import predictor.gui.MainGui;
 import predictor.model.PredictionModel;
+import predictor.model.PredictionModel2;
 import predictor.model.Sampler;
 import predictor.model.data.House;
 import predictor.model.regression.PreProcessor;
 
 public class AreaPredictionTask extends SwingWorker<Void, MessagePack> {
-	private PredictionModel m;
+	private PredictionModel2 m;
 	private MainGui g;
 	boolean workDone;
 	
 	public AreaPredictionTask(MainGui g){
 		super();
 		this.g = g;
+		
 	}
 	
 	@Override
 	protected Void doInBackground() throws Exception{
+		workDone = false;
 		List<House> testHouses = null;
 		String zip = g.getInputAreaZip();
 		try{
 			if(!Sampler.isDataOfZipUp2Date(zip)){
-				try{
-					Sampler.updateDataOfzip(zip);
-				}
-				catch(Exception e){
-					e.printStackTrace();
-				}
+				Sampler.updateDataOfzip(zip);
 			}
-			testHouses = PreProcessor.basicFilter(Sampler.getDataOfZip(zip));
-			testHouses = PreProcessor.soldTimeFilter(testHouses, 360);
-			
-			//--------------------------------------------
-			List<House> temp = Sampler.getDataOfZip(zip);
-			for(int i = 0; i < temp.size(); i++){
-				System.out.println(temp.get(i).floorSize + "," + temp.get(i).lastSoldPrice);
-			}
+			testHouses = Sampler.getDataOfZip(zip);
 			
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
 		
+		//remove testing data with missing/error feature
+		testHouses = PreProcessor.basicFilter(testHouses);
 		
 		double[] errorPercentage = new double[testHouses.size()];
-		
-		for(int j = 0; j < testHouses.size(); j++){
-
-			m = new PredictionModel();
-			workDone = false;
+		for(int i = 0; i < testHouses.size(); i++){
 			int progress = 0;
-			m.target = testHouses.get(j);
+			
+			m = new PredictionModel2();
+			m.setTarget(testHouses.get(i));
 			
 			progress = 30;
 			
-//			//sample range (in miles)
-//			double range = 1.0;
-//			List<String> CoordinateList = Sampler.getSampleCoordinateList(m.target.latitude, m.target.longitude, range);
-//			for(int i = 0; !isCancelled() && i < CoordinateList.size(); i++){
-//				int persentage = i * 100 / CoordinateList.size();
-//				progress = 30 + 30 * persentage / 100;
-//				publish(new MessagePack(progress, "Get Sample Houses: " + persentage + "%"));
-//				
-//				if(!Sampler.isDataOfCoordinateUp2Date(CoordinateList.get(i))){
-//					publish(new MessagePack(progress, "Get Sample Houses: " + persentage + "%  Updating Data..."));
-//					try{
-//						Sampler.updateDataOfCoordinate(CoordinateList.get(i));
-//					}
-//					catch(Exception e){
-//						e.printStackTrace();
-//					}
-//					if(isCancelled()){
-//						return null;
-//					}
-//				}
-//				try{
-//					m.addSamples(Sampler.getDataOfCoordinate(CoordinateList.get(i)));
-//				}
-//				catch(Exception e){
-//					e.printStackTrace();
-//				}
-//			}
-			
-			m.addSamples(Sampler.getDataOfZip(zip));
+			m.setSamples(testHouses);
+//				m.addSamples(ZillowParser.parseArea(m.target.latitude, m.target.longitude, 0.042197, 0.056992));
 			
 			progress = 60;
 			publish(new MessagePack(progress, "Predicting"));
 			
 			try{
-				m.sampleFilter(g.getSampleNumber());
+//				m.setSampleNumber(g.getSampleNumber());
 				m.setVariable(Common.getVariableOptions(g));
 				m.setVariableTransfer(Common.getVariableTransferOptions(g));
 				m.setValueTransfer(Common.getValueTransferOptions(g));
 				m.predict(Common.getMethod(g));
+
 			}
 			catch(Exception e){
 				publish(new MessagePack(progress, "Oops, Something Went Wrong"));
 				e.printStackTrace();
 			}
 			
-			errorPercentage[j] = Math.abs((m.target.predictPrice - m.target.lastSoldPrice) / m.target.lastSoldPrice);
-			System.err.println(m.target.predictPrice + ", " + m.target.lastSoldPrice + ", " + errorPercentage[j]);
+			errorPercentage[i] = Math.abs((m.target.predictPrice - m.target.lastSoldPrice) / m.target.lastSoldPrice);
+//				System.err.println(m.target.predictPrice + ", " + m.target.lastSoldPrice + ", " + errorPercentage[j]);
+			System.out.println(m.target.lastSoldPrice + "," + m.target.floorSize + "," + m.target.lotSize + 
+					"," + m.target.bedroomNumber + "," + m.target.bathroomNumber + "," + m.target.builtYear + "," + 
+					m.target.longitude + "," + m.target.latitude + "," + m.target.address + "," + 
+					m.target.lastSoldPrice / m.target.floorSize + "," + m.target.predictPrice + "," + m.sampleList.size());
+//			System.out.println(m.target.lastSoldPrice + "," + m.target.predictPrice);
+
 		}
-		
+	
+	
 		int five = 0;
 		int ten = 0;
+		int fifteen = 0;
 		int twenty = 0;
-		int fifty = 0;
 		for(int i = 0; i < errorPercentage.length; i++){
 			if(errorPercentage[i] < 0.05){
 				five++;
 				ten++;
+				fifteen++;
 				twenty++;
-				fifty++;
 			}
 			else if(errorPercentage[i] < 0.1){
 				ten++;
+				fifteen++;
 				twenty++;
-				fifty++;
+			}
+			else if(errorPercentage[i] < 0.15){
+				fifteen++;
+				twenty++;
 			}
 			else if(errorPercentage[i] < 0.2){
 				twenty++;
-				fifty++;
 			}
-			else if(errorPercentage[i] < 0.5){
-				fifty++;
-			}
-//			System.err.println(errorPercentage[i]);
 		}
-		
-		showResult("Error Rate:");
-		showResult("Error Rate in 5%");
+	
+	
+//		showResult("Error Rate:");
+//		showResult("Error Rate in 5%");
 		showResult(String.valueOf((double)five / (double)errorPercentage.length));
-		showResult("");
-		showResult("Error Rate in 10%");
+//		showResult("");
+//		showResult("Error Rate in 10%");
 		showResult(String.valueOf((double)ten / (double)errorPercentage.length));
-		showResult("");
-		showResult("Error Rate in 20%");
+//		showResult("");
+//		showResult("Error Rate in 20%");
+		showResult(String.valueOf((double)fifteen / (double)errorPercentage.length));
+//		showResult("");
+//		showResult("Error Rate in 50%");
 		showResult(String.valueOf((double)twenty / (double)errorPercentage.length));
 		showResult("");
-		showResult("Error Rate in 50%");
-		showResult(String.valueOf((double)fifty / (double)errorPercentage.length));
-
+		showResult(String.valueOf(errorPercentage.length));
+		
+		
 		workDone = true;
 		return null;
+
 	}
 	
 	@Override
@@ -168,7 +144,7 @@ public class AreaPredictionTask extends SwingWorker<Void, MessagePack> {
 //            g.startTestButton.setEnabled(true);
             g.showInputCard();
     	}
-    	// error occured
+    	// error occurred
     	else{
 //            g.cancelButton.setEnabled(false);
 //            g.startTestButton.setEnabled(true);

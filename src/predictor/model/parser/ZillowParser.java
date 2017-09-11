@@ -20,20 +20,21 @@ public class ZillowParser {
 	// IOException, FailingHttpStatusCodeException, MalformedURLException
     public static ArrayList<House> parseArea(Double latitude, Double longitude, Double latitudeRange, Double longitudeRange) throws Exception {
         // http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/globalrelevanceex_sort/42.130232,-71.153255,42.10139,-71.193381_rect/14_zm/2_p/
-
+//    	42.444456 - 42.402259 = 0.042197
+//    	-71.154714 - -71.211706 = 0.056992
         ArrayList<House> houses = new ArrayList<House>();
         DecimalFormat formatter = new DecimalFormat("0.000000");
         
         // count coordinate into certain format String
-        String up = formatter.format(latitude + latitudeRange);
-        String down = formatter.format(latitude);
-        String right = formatter.format(longitude + longitudeRange);
-        String left = formatter.format(longitude - longitudeRange);
+        String up = formatter.format(latitude + latitudeRange / 2);
+        String down = formatter.format(latitude - latitudeRange / 2);
+        String right = formatter.format(longitude + longitudeRange / 2);
+        String left = formatter.format(longitude - longitudeRange / 2);
 
         // make URL of target area
-        String leftUrl = "http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/globalrelevanceex_sort/";
+        String leftUrl = "http://www.zillow.com/homes/recently_sold/house,apartment_duplex,townhouse_type/12m_days/globalrelevanceex_sort/";
         String middleUrl = up + "," + right + "," + down + "," + left;
-        String rightUrl = "_rect/15_zm/";
+        String rightUrl = "_rect/14_zm/";
 
         int parsePages = 1;
 
@@ -107,7 +108,7 @@ public class ZillowParser {
         // make URL of target area
         String leftUrl = "https://www.zillow.com/homes/recently_sold/";
         String middleUrl = zip;
-        String rightUrl = "_rb/house,apartment_duplex,townhouse_type/";
+        String rightUrl = "_rb/house,townhouse_type/24m_days/";
 
         int parsePages = 1;
 
@@ -116,6 +117,7 @@ public class ZillowParser {
             System.err.println("get list of nearby houses from: "+ url);
             Document udoc;
             Elements urlElements;
+            Elements captchaElements;
             
             
         	WebClient wc = new WebClient();
@@ -124,22 +126,37 @@ public class ZillowParser {
             wc.getOptions().setThrowExceptionOnScriptError(false);
             wc.getOptions().setTimeout(10000);
             
+            boolean parseResult = false;
+            
             try{
 	            HtmlPage page = wc.getPage(url);
 	            int errorCount = 0;
 	            while(true){
 	                udoc = Jsoup.parse(page.asXml(), "http://www.zillow.com");
 	                urlElements = udoc.select("a[class=\"zsg-photo-card-overlay-link routable hdp-link routable mask hdp-link\"]");
+	                captchaElements = udoc.select("div[class=\"error-text-content\"]");
+	                if(captchaElements.isEmpty() == false){
+	                	System.err.println(captchaElements.text());
+	                }
 	                if(urlElements.isEmpty() && errorCount++ < 200){
-	                		Thread.sleep(200);
+	                	System.err.println(errorCount);
+	                	Thread.sleep(2000);
 	                }
 	                else{
+	                	parseResult = true;
 	                    break;
 	                }
 	            }
             }
             finally{
             	wc.close();
+            }
+            
+            if(parseResult == false){
+            	i--;
+            	System.err.println("Fail");
+            	Thread.sleep(1000000);
+            	continue;
             }
 
             // get page number
@@ -153,9 +170,10 @@ public class ZillowParser {
 
             for(Element u : urlElements){
                 String houseUrl = u.attr("abs:href");
-                // System.err.println(houseUrl);
+                System.err.println(houseUrl);
                 House tempHouse;
                 try{
+                	Thread.sleep(5000);
                 	tempHouse = parseHouseDetailPage(houseUrl);
                 }
                 catch(Exception e){
@@ -166,6 +184,7 @@ public class ZillowParser {
                 if(tempHouse != null){
             		houses.add(tempHouse);
             	}
+
             }
         }
         return houses;
@@ -186,11 +205,26 @@ public class ZillowParser {
 	//return null if missing important information on page
 	//throws IOException
 	public static House parseHouseDetailPage(String url) throws Exception{
+		
         Document doc;
         House h = new House();
-        
+
         //get house's page
-        doc = Jsoup.connect(url).get();
+        while(true){
+        	doc = Jsoup.connect(url).get();
+	        Elements captchaElements = doc.select("div[class=\"error-text-content\"]");
+	        if(captchaElements.isEmpty() == false){
+	        	System.err.println(captchaElements.text());
+	        	Thread.sleep(1000000);
+	        }
+	        else{
+	        	break;
+	        }
+        }
+
+        
+        Elements captchaElements = doc.select("div[class=\"error-text-content\"]");
+        System.err.println(captchaElements.text());
         
         //////////////////
         // start Parsing//
@@ -198,6 +232,7 @@ public class ZillowParser {
         
         // address, city, state, zip
         Elements addressElements = doc.select("header[class=\"zsg-content-header addr\"]").select("h1[class=\"notranslate\"]");
+        System.err.println(addressElements.text());
         if(!addressElements.isEmpty() && addressElements.size() >= 1){
 	        String fullAddress = addressElements.get(0).text();
 	        if(!fullAddress.isEmpty() && fullAddress.split(",").length >= 3 && fullAddress.split(",")[2].split(" ").length >= 3){
@@ -208,6 +243,7 @@ public class ZillowParser {
 		        if(h.address.isEmpty() || h.city.isEmpty() || h.state.isEmpty() || h.zip.isEmpty()){
 		        	return null;
 		        }
+		        System.out.println(h.address);
 	        }
 	        else{
 	        	return null;
@@ -287,7 +323,7 @@ public class ZillowParser {
         	
         	if(!soldDateElements.isEmpty()){
 	            String lastSoldDateString = soldDateElements.get(0).text();
-	            SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yy");
+	            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
 	            try{
 	            	h.lastSoldDate = sdf.parse(lastSoldDateString);
 	            }
@@ -308,7 +344,7 @@ public class ZillowParser {
         }
         else{
         	//house type
-        	h.houseType = mainFeatureElements.get(0).select("div[class=\"hdp-fact-ataglance-value\"]").text();
+//        	h.houseType = mainFeatureElements.get(0).select("div[class=\"hdp-fact-ataglance-value\"]").text();
         	
         	//built year
         	
@@ -353,8 +389,23 @@ public class ZillowParser {
 	        
         }
         
-//        Elements allFeatureElements = doc.select("dic[class=\"z-moreless-content hdp-fact-moreless-content\"]");
+        Elements allFeatureElements = doc.select("div[class=\"hdp-facts-expandable-container clear\"]")
+				.select("div[class=\"z-moreless-content hdp-fact-moreless-content collapse\"]")
+				.select("div[class=\"hdp-fact-container-columns\"]")
+				.select("div[class=\"hdp-fact-container\"]")
+				.select("ul[class=\"zsg-sm-1-1 hdp-fact-list\"]")
+				.select("li[class=\"\"]")
+				.select("span[class=\"hdp-fact-value\"]");
+//		h.features = allFeatureElements.text();
+//		System.out.println(h.features);
         
+		Elements allDiscription = doc.select("div[class=\"notranslate zsg-content-item\"]");
+		Elements halfShowedDiscription = allDiscription.clone();
+		halfShowedDiscription.select("span").remove();
+		Elements halfHideDiscription = allDiscription.select("span[class=\"hide\"]");
+//		System.out.println(halfShowedDiscription.text() + halfHideDiscription.text());
+		h.discription = halfShowedDiscription.text() + halfHideDiscription.text();
+		
 		return h;
 	}
 	

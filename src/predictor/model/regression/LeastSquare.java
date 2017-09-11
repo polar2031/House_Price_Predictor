@@ -50,14 +50,12 @@ public class LeastSquare {
 			rss += Math.abs(Math.pow(yLamda, 1.0 / lamda) - Math.pow(b[i], 1.0 / lamda));
 		}
 		rss /= a.length;
-//		System.err.println("rss: " + rss);
 		return rss;
 	}
 	
-	public void showSolution(){
+	public void showSolution(String value[]){
         // show solution
         double[][] o = solution.getData();
-        String value[] = {"floor size", "lot size", "base price", "bedroom", "bathroom", "age", "summer", "fall", "winter"};
         System.err.println("Variables");
         for(int i = 0; i < solution.getRowDimension(); i++){
             System.err.print(value[i] + ": ");
@@ -66,6 +64,20 @@ public class LeastSquare {
             }
             System.err.println("");
         }
+	}
+	
+	public void showSolution(){
+        // show solution
+        String value[] = {"Base Price", 
+        		"Floor Size", 
+        		"Lot Size", 
+        		"Bedroom Number", 
+        		"Bathroom Number", 
+        		"Bath/Bed", 
+        		"avgBedSize", 
+        		"Age"};
+        this.showSolution(value);
+
 	}
 	
 	public boolean isSolutionExist(){
