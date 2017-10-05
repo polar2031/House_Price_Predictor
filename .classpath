@@ -28,6 +28,5 @@
 	<classpathentry kind="lib" path="lib/htmlunit-2.27/lib/xalan-2.7.2.jar"/>
 	<classpathentry kind="lib" path="lib/htmlunit-2.27/lib/xercesImpl-2.11.0.jar"/>
 	<classpathentry kind="lib" path="lib/htmlunit-2.27/lib/xml-apis-1.4.01.jar"/>
-	<classpathentry kind="src" path="/la4j-0.6.0"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

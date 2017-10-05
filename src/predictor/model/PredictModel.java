@@ -97,6 +97,36 @@ public class PredictModel {
     		bestL = new LeastSquare(sampleVariable, sampleSolution);
     		target.predictPrice = bestL.solve(targetVariable);
     	}
+    	
+    	
+    	// linear regression using all samples, transfer price with logE
+//    	else if(method == 3){
+////    		takeNSimilarSamples(sampleNumber);
+//    		// build sample matrix
+//    		VariableOption v = new VariableOption();
+//    		v.setBasePriceFlag(true);
+//    		v.setFloorSizeFlag(true);
+//    		v.setLotSizeFlag(true);
+//    		v.setBathroomNumberFlag(true);
+//    		v.setBedroomNumberFlag(true);
+//    		v.setAgeFlag(true);
+//    		
+//    		double[][] sampleVariable = new double[sampleList.size()][v.variableNumber()];
+//        	double[] sampleSolution = new double[sampleList.size()];
+//        	double[][] targetVariable  = new double[1][v.variableNumber()];
+//        	
+//        	for(int i = 0; i < sampleList.size(); i++){
+//        		sampleVariable[i] = v.variableTransform(sampleList.get(i));
+//        		sampleSolution[i] = Math.log(sampleList.get(i).lastSoldPrice);
+//        	}
+//        	
+//        	targetVariable[0] = v.variableTransform(target);
+//        	
+//    		LeastSquare bestL;
+//    		bestL = new LeastSquare(sampleVariable, sampleSolution);
+//    		target.predictPrice = Math.pow(Math.E, bestL.solve(targetVariable));
+////    		bestL.showSolution();
+//    	}
 //    	
     	else if(method == 3){
 //    		takeNSimilarSamples(sampleNumber);
@@ -198,9 +228,6 @@ public class PredictModel {
     		target.predictPrice = Math.pow(Math.E, (bestL.solve(targetVariable) + Math.log(target.floorSize * avgPrice)));
     		String[] val = {"lot", "bed", "bath", "bath/bed", "floorsize/bed", "age"};
 //    		bestL.showSolution(val);
-    	}
-    	else if(method == 5){
-    		
     	}
     }
     
