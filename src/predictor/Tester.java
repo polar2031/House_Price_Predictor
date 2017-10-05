@@ -38,6 +38,9 @@ public class Tester {
 		}
 		//remove testing data with missing/error feature
 		testHouses = PreProcessor.basicFilter(testHouses);
+		for(int i = 50; i < testHouses.size();){
+			testHouses.remove(i);
+		}
 		System.out.println(testHouses.size());
 //		int bestSampleNumber = 30;
 //		int bestSampleNumber = 17; //02067
