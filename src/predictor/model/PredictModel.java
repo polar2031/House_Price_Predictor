@@ -82,6 +82,8 @@ public class PredictModel {
     		v.setBedroomNumberFlag(true);
     		v.setAgeFlag(true);
     		
+    		
+    		
     		double[][] sampleVariable = new double[sampleList.size()][v.variableNumber()];
         	double[] sampleSolution = new double[sampleList.size()];
         	double[][] targetVariable  = new double[1][v.variableNumber()];
@@ -243,4 +245,5 @@ public class PredictModel {
     public void setSampleNumber(int n){
     	sampleNumber = n;
     }
+    
 }

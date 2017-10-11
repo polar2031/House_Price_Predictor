@@ -344,7 +344,7 @@ public class ZillowParser {
         }
         else{
         	//house type
-//        	h.houseType = mainFeatureElements.get(0).select("div[class=\"hdp-fact-ataglance-value\"]").text();
+        	h.houseType = mainFeatureElements.get(0).select("div[class=\"hdp-fact-ataglance-value\"]").text();
         	
         	//built year
         	
@@ -394,10 +394,13 @@ public class ZillowParser {
 				.select("div[class=\"hdp-fact-container-columns\"]")
 				.select("div[class=\"hdp-fact-container\"]")
 				.select("ul[class=\"zsg-sm-1-1 hdp-fact-list\"]")
-				.select("li[class=\"\"]")
-				.select("span[class=\"hdp-fact-value\"]");
-//		h.features = allFeatureElements.text();
-//		System.out.println(h.features);
+				.select("li[class=\"\"]");
+		h.features = new String[allFeatureElements.size()]; 
+		for(int i = 0; i < allFeatureElements.size(); i++){
+			h.features[i] = allFeatureElements.get(i).text();
+//			System.out.println(h.features[i]);
+		}
+		
         
 		Elements allDiscription = doc.select("div[class=\"notranslate zsg-content-item\"]");
 		Elements halfShowedDiscription = allDiscription.clone();

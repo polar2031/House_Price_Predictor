@@ -24,7 +24,7 @@ public class Tester {
 		List<House> testHouses = null;
 		
 		
-		String zip = "02062";
+		String zip = "02067";
 		System.out.println(zip);
 		
 		try{

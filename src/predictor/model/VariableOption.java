@@ -9,14 +9,20 @@ public class VariableOption {
 	public static final int lotSize = 2;
 	public static final int bedroomNumber = 3;
 	public static final int bathroomNumber = 4;
-	public static final int age = 5;
+	public static final int bathBedRatio = 5;
+	public static final int avgFloorSizePerBedroom = 6;
+	public static final int age = 7;
 	public static final int maxVariable = 8;
 	public static final String[] variableName = {
 			"Base Price", 
 			"Floor Size", 
 			"Lot Size", 
 			"Bedroom Number", 
-			"Bathroom Number"};
+			"Bathroom Number", 
+			"Bathroom / Bedroom",
+			"Avg Bedroom Size",
+			"Age"
+			};
 	
 	boolean[] variableFlag;
 	boolean[] variableTransferFlag;
@@ -30,30 +36,13 @@ public class VariableOption {
 		variableFlag = new boolean[maxVariable];
 		variableTransferFlag = new boolean[maxVariable];
 		for(int i = 0; i < variableFlag.length; i++){
-			variableFlag[i] = false;
+			//Enable all variable by default
+			variableFlag[i] = true;
+			//Disable all variable transfer by default
 			variableTransferFlag[i] = false;
 		}
 	}
-	public void setBasePriceFlag(boolean b){
-		variableFlag[basePrice] = b;
-	}
-	public void setFloorSizeFlag(boolean b){
-		variableFlag[floorSize] = b;
-	}
-	public void setLotSizeFlag(boolean b){
-		variableFlag[lotSize] = b;
-	}
-	public void setBedroomNumberFlag(boolean b){
-		variableFlag[bedroomNumber] = b;
-	}
-	public void setBathroomNumberFlag(boolean b){
-		variableFlag[bathroomNumber] = b;
-	}
-	public void setAgeFlag(boolean b){
-		variableFlag[age] = b;
-	}
 
-	
 	public void setTransferFlag(boolean[] bArray){
 		for(int i = 0; i < variableTransferFlag.length; i++){
 			variableTransferFlag[i] = bArray[i];
@@ -91,6 +80,12 @@ public class VariableOption {
         if(variableFlag[bathroomNumber]){
         	usedVariableTransferFlag[v++] = variableTransferFlag[bathroomNumber];
         }
+        if(variableFlag[bathBedRatio]){
+        	usedVariableTransferFlag[v++] = variableTransferFlag[bathBedRatio];
+        }
+        if(variableFlag[avgFloorSizePerBedroom]){
+        	usedVariableTransferFlag[v++] = variableTransferFlag[avgFloorSizePerBedroom];
+        }
         if(variableFlag[age]){
         	usedVariableTransferFlag[v++] = variableTransferFlag[age];
         }
@@ -101,7 +96,7 @@ public class VariableOption {
 	
 	public double[] variableTransform(House target) {
 		int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-        double[] a = new double[variableNumber() + 2];
+        double[] a = new double[variableNumber()];
         int v = 0;
         
         if(variableFlag[basePrice]){
@@ -120,26 +115,45 @@ public class VariableOption {
         if(variableFlag[bathroomNumber]){
         	a[v++] = target.bathroomNumber;
         }
-        a[v++] = target.bathroomNumber / target.bedroomNumber;
-        a[v++] = target.floorSize / target.bedroomNumber;
+        if(variableFlag[bathBedRatio]){
+        	a[v++] = target.bathroomNumber / target.bedroomNumber;
+        }
+        if(variableFlag[avgFloorSizePerBedroom]){
+        	a[v++] = target.floorSize / target.bedroomNumber;
+        }
         if(variableFlag[age]){
 //        	a[v++] = (double)(thisYear - target.builtYear);
         	if(thisYear - target.builtYear + 1 > 0){
-        		a[v++] = Math.log((double)(thisYear - target.builtYear + 1));
+        		a[v++] = thisYear - target.builtYear;
+//        		a[v++] = Math.log((double)(thisYear - target.builtYear + 1));
         	}
         	else{
-        		a[v++] = Math.log(50);
+        		// wrong built date, guess
+        		a[v++] = 50;
+//        		a[v++] = Math.log(50);
         	}
-//        	a[v++] = -Math.pow((double)(thisYear - target.builtYear), 2);
-//        	if((54 - (thisYear - target.builtYear)) >= 0){
-//        		a[v++] = Math.pow((double)(54 - (thisYear - target.builtYear)), 5);
-//        	}
-//        	else{
-//        		a[v++] = -Math.pow((double)(- 54 + (thisYear - target.builtYear)), 5);
-//        	}
         }
 
 		return a;
+	}
+	
+	public void setBasePriceFlag(boolean b){
+		variableFlag[basePrice] = b;
+	}
+	public void setFloorSizeFlag(boolean b){
+		variableFlag[floorSize] = b;
+	}
+	public void setLotSizeFlag(boolean b){
+		variableFlag[lotSize] = b;
+	}
+	public void setBedroomNumberFlag(boolean b){
+		variableFlag[bedroomNumber] = b;
+	}
+	public void setBathroomNumberFlag(boolean b){
+		variableFlag[bathroomNumber] = b;
+	}
+	public void setAgeFlag(boolean b){
+		variableFlag[age] = b;
 	}
 	
 }

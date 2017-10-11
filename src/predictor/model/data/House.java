@@ -34,10 +34,11 @@ public class House implements Serializable{
 
     // non standard features
     public String discription;
-//	public String features;
+	public String houseType;
 	public String heating;
 	public String cooling;
 	public String parking;
+	public String features[];
 
     public House(){
     }
